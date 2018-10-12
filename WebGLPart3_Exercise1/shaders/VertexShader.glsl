@@ -1,8 +1,9 @@
 attribute vec2 aVertexPosition;
 
-uniform vec3 uProjectionMat;
-uniform vec3 uModelMat;
+uniform mat3 uProjectionMat;
+uniform mat3 uModelMat;
 
 void main() {
-    gl_Position = vec4(uProjectionMat * vec3(aVertexPosition, 1), 1);
+    vec3 pos = uProjectionMat * vec3(aVertexPosition, 1);
+    gl_Position = vec4(pos.xy, 0, pos.z);
 }

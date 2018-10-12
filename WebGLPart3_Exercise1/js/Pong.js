@@ -44,7 +44,7 @@ function initGL() {
     "use strict";
     ctx.shaderProgram = loadAndCompileShaders(gl, 'shaders/VertexShader.glsl', 'shaders/FragmentShader.glsl');
     setUpAttributesAndUniforms();
-    //setUpWorldCoordinates();
+    setUpWorldCoordinates();
     setUpBuffers();
     
     gl.clearColor(0.1, 0.1, 0.1, 1);
@@ -56,7 +56,6 @@ function initGL() {
 function setUpWorldCoordinates() {
     var projectionMat = mat3.create(); // New 3x3-Matrix
     mat3.fromScaling(projectionMat, [2.0/gl.drawingBufferWidth, 2.0/gl.drawingBufferHeight]);
-    //console.log(projectionMat);
     gl.uniformMatrix3fv(ctx.uProjectionMatId, false, projectionMat);
 }
 
