@@ -82,6 +82,8 @@ function setUpBuffers(){
         0.5, -0.5,
         0.5, 0.5,
         -0.5, 0.5];
+
+    console.log(vertices);
     gl.bindBuffer(gl.ARRAY_BUFFER, rectangleObject.buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 }
@@ -94,8 +96,12 @@ function draw() {
     console.log("Drawing");
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-
-
+    var modelMat = mat3.create(); // New 3x3-Matrix
+    console.log(modelMat);
+    mat3.fromTranslation(modelMat, [200,200]);
+    mat3.scale(modelMat,modelMat, [100, 100]);
+    console.log(modelMat);
+    gl.uniformMatrix3fv(ctx.uModelMatId, false, modelMat);
 
 
     gl.bindBuffer(gl.ARRAY_BUFFER, rectangleObject.buffer);
