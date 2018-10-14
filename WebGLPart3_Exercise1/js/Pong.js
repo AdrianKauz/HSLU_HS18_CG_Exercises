@@ -97,10 +97,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     var modelMat = mat3.create(); // New 3x3-Matrix
-    console.log(modelMat);
-    mat3.fromTranslation(modelMat, [200,200]);
-    mat3.scale(modelMat,modelMat, [100, 100]);
-    console.log(modelMat);
+    mat3.fromScaling(modelMat, [100, 100]);
     gl.uniformMatrix3fv(ctx.uModelMatId, false, modelMat);
 
 
