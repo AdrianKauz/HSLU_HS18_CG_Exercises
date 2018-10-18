@@ -68,6 +68,10 @@ function RectangleManager() {
         this.rectangles.get(name).PosY = newPosY;
     }
 
+    this.moveVertical = function(name, delta) {
+        this.rectangles.get(name).PosY += delta;
+    }
+
     this.drawAll = function() {
         for(var x = 0; x < this.rectangles.count(); x++) {
             var currRectangle = this.rectangles.get(x);
@@ -83,7 +87,6 @@ function RectangleManager() {
 
             gl.uniform4f(ctx.uColorId, 1, 1, 1, 1);
             gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-            console.log("Rectangle");
         }
     }
 }
@@ -121,6 +124,7 @@ function initGL() {
     rectangleManager.initBuffer();
 
     gl.clearColor(0.0, 0.0, 0.0, 1);
+    window.requestAnimationFrame(gameLoop);
 }
 
 
@@ -163,12 +167,83 @@ function initObjects() {
     rectangleManager.setPosition(NET, 0, 0);
 }
 
+
+var oldTimeStamp = null;
+function gameLoop(newTimeStamp = 0) {
+    if(oldTimeStamp === null) {
+        oldTimeStamp = newTimeStamp
+    }
+
+    if((newTimeStamp - oldTimeStamp) > 10) {
+        oldTimeStamp = newTimeStamp;
+        draw();
+    }
+    window.requestAnimationFrame(gameLoop);
+}
+
 function draw() {
-    "use strict";
-    console.log("Drawing");
     gl.clear(gl.COLOR_BUFFER_BIT);
+    moveLeftPlayer();
     rectangleManager.drawAll();
 }
+
+var moveDown = false;
+var moveUp = false;
+
+
+function Players() {
+
+}
+
+
+
+
+
+
+
+
+
+
+
+function moveLeftPlayer() {
+    if(moveDown) {
+        rectangleManager.moveVertical(LEFT_PLAYER, 8);
+    }
+
+    if(moveUp) {
+        rectangleManager.moveVertical(LEFT_PLAYER, -8);
+    }
+
+
+}
+
+
+
+document.addEventListener('keydown', (event) => {
+    switch (event.key) {
+        case "w":
+            moveUp = true;
+            break;
+        case "a":
+            moveDown = true;
+            break;
+        default:
+            break;
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    switch (event.key) {
+        case "w":
+            moveUp = false;
+            break;
+        case "a":
+            moveDown = false;
+            break;
+        default:
+            break;
+    }
+});
 
 
 
