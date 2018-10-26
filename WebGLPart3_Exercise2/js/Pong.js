@@ -5,6 +5,7 @@
 //
 
 // Constants
+const MODEL_REFRESH_RATE_PER_SECOUND = 60;
 const BALL = "Ball";
 const NET = "Net";
 const LEFT_PLAYER_NAME = "LeftPlayer";
@@ -15,8 +16,8 @@ const RIGHT_PLAYER_NAME = "RightPlayer";
 const RIGHT_PLAYER = "RightPad";
 const RIGHT_PLAYER_DOWN = "l";
 const RIGHT_PLAYER_UP = "p";
-const PLAYER_DEFAULT_VELOCITY = 10;
-
+const PLAYER_DEFAULT_VELOCITY = 360; // PPS (Pixel per Secound)
+const BALL_DEFAULT_VELOCITY = 360;
 
 
 // Register function to call after document has loaded
@@ -30,6 +31,8 @@ var playerRight = new PlayerObject();
 var ball = new BallObject();
 var canvasHeigth = 0;
 var canvasWidth = 0;
+var modelRefreshTimer = null;
+var fpsWebElement = null;
 
 var ctx = {
     shaderProgram: -1,
@@ -92,6 +95,7 @@ function RectangleManager() {
  */
 function startup() {
     "use strict";
+    fpsWebElement = document.getElementById("fps_viewer");
     var canvas = document.getElementById("myCanvas");
     canvasHeigth = canvas.height;
     canvasWidth = canvas.width;
@@ -99,8 +103,9 @@ function startup() {
     initGL();
     initObjects();
     addAllEventListener()
-    draw();
-    gameLoop();
+
+    // Starting gameloop
+    modelRefreshTimer = setInterval(gameLoop, 1000 / MODEL_REFRESH_RATE_PER_SECOUND);
 }
 
 
@@ -168,18 +173,24 @@ function initObjects() {
 }
 
 
-var oldTimeStamp = null;
-function gameLoop(newTimeStamp = 0) {
-    if(oldTimeStamp === null) {
-        oldTimeStamp = newTimeStamp
-    }
+function gameLoop() {
+    refreshModel();
+    window.requestAnimationFrame(drawScene);
+}
 
-    if((newTimeStamp - oldTimeStamp) > 10) {
-        oldTimeStamp = newTimeStamp;
-        refreshModel();
-        draw();
-    }
-    window.requestAnimationFrame(gameLoop);
+
+function drawScene(currTimeStamp) {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    rectangleManager.drawAll();
+    refreshFpsViewer(currTimeStamp);
+}
+
+var oldTimeStamp = new Date();
+function refreshFpsViewer(currTimeStamp) {
+    var deltaTime = currTimeStamp - oldTimeStamp;
+    fpsWebElement.innerHTML = (deltaTime == 0) ? 0 : Math.floor(( 1000 / deltaTime));
+
+    oldTimeStamp = currTimeStamp;
 }
 
 
@@ -187,7 +198,7 @@ function refreshModel() {
     collisionHandling()
     playerLeft.refreshPosition();
     playerRight.refreshPosition();
-    //refreshBall()
+    ball.refreshPosition();
 }
 
 
@@ -211,14 +222,22 @@ function collisionHandling() {
     }
 
     // Ball
+    if(ball.isTouchingY(340)) {
+        ball.invertDirectionY();
+    }
 
+    if(ball.isTouchingY(-340)) {
+        ball.invertDirectionY();
+    }
 
-}
+    if(ball.isTouchingX(630)) {
+        ball.invertDirectionX();
+    }
 
+    if(ball.isTouchingX(-630)) {
+        ball.invertDirectionX();
+    }
 
-function draw() {
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    rectangleManager.drawAll();
 }
 
 
@@ -272,7 +291,7 @@ PlayerObject()
 function PlayerObject() {
     this.PlayerIsMovingUp = false;
     this.PlayerIsMovingDown = false;
-    this.PlayerVelocityY = PLAYER_DEFAULT_VELOCITY; // Pixel per Step
+    this.PlayerVelocityY = PLAYER_DEFAULT_VELOCITY; // Pixel per secound
     this.PlayerRectangleObject = null;
 
     this.setVelocity = function(newVelocity) {
@@ -286,12 +305,14 @@ function PlayerObject() {
 
     this.refreshPosition = function() {
         if(this.PlayerRectangleObject != null) {
+            const moveDeltaY = (this.PlayerVelocityY / MODEL_REFRESH_RATE_PER_SECOUND);
+
             if(this.PlayerIsMovingUp) {
-                this.PlayerRectangleObject.PosY += this.PlayerVelocityY;
+                this.PlayerRectangleObject.PosY += moveDeltaY;
             }
 
             if(this.PlayerIsMovingDown) {
-                this.PlayerRectangleObject.PosY -= this.PlayerVelocityY;
+                this.PlayerRectangleObject.PosY -= moveDeltaY;
             }
         }
     }
@@ -310,14 +331,40 @@ BallObject()
 ================
 */
 function BallObject() {
-    this.VelocityX = 0; // Pixel per Step
-    this.VelocityY = 0; // Pixel per Step
+    this.VelocityX = BALL_DEFAULT_VELOCITY; // Pixel per Step
+    this.VelocityY = BALL_DEFAULT_VELOCITY; // Pixel per Step
     this.BallRectangleObject = null;
 
+    this.setVelocity = function(newVelocityX, newVelocityY) {
+        this.VelocityX = newVelocityX;
+        this.VelocityY = newVelocityY;
+    }
+
+    this.invertDirectionX = function() {
+        this.VelocityX = -this.VelocityX;
+    }
+
+    this.invertDirectionY = function() {
+        this.VelocityY = -this.VelocityY;
+    }
+
+    this.isTouchingX = function(newPosX) {
+        return (newPosX < (this.BallRectangleObject.PosX + (this.BallRectangleObject.Width/2))) &&
+            (newPosX > (this.BallRectangleObject.PosX - (this.BallRectangleObject.Width/2)))
+    }
+
+    this.isTouchingY = function(newPosY) {
+        return (newPosY < (this.BallRectangleObject.PosY + (this.BallRectangleObject.Height/2))) &&
+            (newPosY > (this.BallRectangleObject.PosY - (this.BallRectangleObject.Height/2)))
+    }
+
     this.refreshPosition = function() {
-        if(this.PlayerRectangleObject != null) {
-            this.BallRectangleObject.PosX += this.VelocityX;
-            this.BallRectangleObject.PosY += this.VelocityY;
+        const moveDeltaX = (this.VelocityX / MODEL_REFRESH_RATE_PER_SECOUND);
+        const moveDeltaY = (this.VelocityY / MODEL_REFRESH_RATE_PER_SECOUND);
+
+        if(this.BallRectangleObject != null) {
+            this.BallRectangleObject.PosX += moveDeltaX;
+            this.BallRectangleObject.PosY += moveDeltaY;
         }
     }
 

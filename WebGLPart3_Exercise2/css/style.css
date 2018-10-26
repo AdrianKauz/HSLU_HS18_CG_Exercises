@@ -18,6 +18,11 @@ html, body {
     color: rgb(255, 255, 255);
 }
 
+.fps {
+    font-family: "Arial Black";
+    color: rgb(255, 255, 255);
+}
+
 #myCanvas {
     border: 2px dotted rgb(255, 255, 255);
 }
