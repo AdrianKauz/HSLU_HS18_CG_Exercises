@@ -5,7 +5,6 @@
 //
 
 // Constants
-const MODEL_REFRESH_RATE_PER_SECOUND = 60;
 const BALL = "Ball";
 const NET = "Net";
 const LEFT_PLAYER_NAME = "LeftPlayer";
@@ -16,8 +15,17 @@ const RIGHT_PLAYER_NAME = "RightPlayer";
 const RIGHT_PLAYER = "RightPad";
 const RIGHT_PLAYER_DOWN = "l";
 const RIGHT_PLAYER_UP = "p";
-const PLAYER_DEFAULT_VELOCITY = 360; // PPS (Pixel per Secound)
-const BALL_DEFAULT_VELOCITY = 360;
+
+
+// Ball
+const BALL_DEFAULT_HEIGHT = 20;
+const BALL_DEFAULT_WIDTH = 20;
+const BALL_DEFAULT_VELOCITY = 360; // PPS (Pixel per Second)
+
+// Paddles
+const PADDLES_DEFAULT_HEIGHT = 100;
+const PADDLES_DEFAULT_WIDTH = 10;
+const PADDLES_DEFAULT_VELOCITY = 480; // PPS (Pixel per Second)
 
 
 // Register function to call after document has loaded
@@ -25,16 +33,15 @@ window.onload = startup;
 
 // Globals
 var gl;
-var rectangleManager = new RectangleManager();
-var playerLeft = new PlayerObject();
-var playerRight = new PlayerObject();
-var ball = new BallObject();
-var canvasHeigth = 0;
+const rectangleManager = new RectangleManager();
+const playerLeft = new PlayerObject();
+const playerRight = new PlayerObject();
+const ball = new BallObject();
+var canvasHeight = 0;
 var canvasWidth = 0;
-var modelRefreshTimer = null;
 var fpsWebElement = null;
 
-var ctx = {
+const ctx = {
     shaderProgram: -1,
     uProjectionMatId: -1,
     aVertexPositionId: -1,
@@ -43,10 +50,9 @@ var ctx = {
 };
 
 
-
 function RectangleManager() {
     "use strict";
-    this.rectangles = new Dictionary();
+    this.rectangles = [];
     this.buffer = -1;
     this.vertices = [ -0.5, -0.5,
                        0.5, -0.5,
@@ -62,21 +68,19 @@ function RectangleManager() {
 
     this.addNewObject = function(newName, newObject) {
         if(newObject != null) {
-            this.rectangles.add(newName, newObject);
+            this.rectangles.push(newObject);
         }
     }
 
 
     this.drawAll = function() {
-        for(var x = 0; x < this.rectangles.count(); x++) {
-            var currRectangle = this.rectangles.get(x);
+        var currRectangle;
 
+        for(currRectangle of this.rectangles) {
             if(currRectangle.isVisible) {
-                var modelMat = mat3.create(); // New 3x3-Matrix
-
-                mat3.fromTranslation(modelMat, [currRectangle.PosX, currRectangle.PosY]);
-                mat3.scale(modelMat,modelMat, [currRectangle.Width, currRectangle.Height]);
-                gl.uniformMatrix3fv(ctx.uModelMatId, false, modelMat);
+                mat3.fromTranslation(currRectangle.ModelViewMatrix, [currRectangle.PosX, currRectangle.PosY]);
+                mat3.scale(currRectangle.ModelViewMatrix, currRectangle.ModelViewMatrix, [currRectangle.Width, currRectangle.Height]);
+                gl.uniformMatrix3fv(ctx.uModelMatId, false, currRectangle.ModelViewMatrix);
 
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
                 gl.vertexAttribPointer(ctx.aVertexPositionId, 2, gl.FLOAT, false, 0, 0);
@@ -97,15 +101,13 @@ function startup() {
     "use strict";
     fpsWebElement = document.getElementById("fps_viewer");
     var canvas = document.getElementById("myCanvas");
-    canvasHeigth = canvas.height;
+    canvasHeight = canvas.height;
     canvasWidth = canvas.width;
     gl = createGLContext(canvas);
     initGL();
     initObjects();
     addAllEventListener()
-
-    // Starting gameloop
-    modelRefreshTimer = setInterval(gameLoop, 1000 / MODEL_REFRESH_RATE_PER_SECOUND);
+    gameLoop();
 }
 
 
@@ -138,7 +140,7 @@ function setUpAttributesAndUniforms(){
  *  Setup the world coordinates
  */
 function setUpWorldCoordinates() {
-    var projectionMat = mat3.create();
+    const projectionMat = mat3.create();
     mat3.fromScaling(projectionMat, [2.0/gl.drawingBufferWidth, 2.0/gl.drawingBufferHeight]);
     gl.uniformMatrix3fv(ctx.uProjectionMatId, false, projectionMat);
 }
@@ -149,19 +151,19 @@ function initObjects() {
 
     // First add moving objects
     currRectangle.setPosition(0, 0);
-    currRectangle.setSize(20, 20);
+    currRectangle.setSize(BALL_DEFAULT_HEIGHT, BALL_DEFAULT_WIDTH);
     rectangleManager.addNewObject(BALL, currRectangle);
     ball.addRectangle(currRectangle);
 
     currRectangle = new RectangleObject();
     currRectangle.setPosition(-500, 0);
-    currRectangle.setSize(100, 10);
+    currRectangle.setSize(PADDLES_DEFAULT_HEIGHT, PADDLES_DEFAULT_WIDTH);
     rectangleManager.addNewObject(LEFT_PLAYER, currRectangle);
     playerLeft.addRectangle(currRectangle)
 
     currRectangle = new RectangleObject();
     currRectangle.setPosition(500, 0);
-    currRectangle.setSize(100, 10);
+    currRectangle.setSize(PADDLES_DEFAULT_HEIGHT, PADDLES_DEFAULT_WIDTH);
     rectangleManager.addNewObject(RIGHT_PLAYER, currRectangle);
     playerRight.addRectangle(currRectangle)
 
@@ -173,32 +175,33 @@ function initObjects() {
 }
 
 
-function gameLoop() {
-    refreshModel();
-    window.requestAnimationFrame(drawScene);
-}
+var oldTimeStamp = null;
+function gameLoop(currTimeStamp) {
+    if(oldTimeStamp == null) {
+        oldTimeStamp = currTimeStamp;
+    }
 
-
-function drawScene(currTimeStamp) {
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    rectangleManager.drawAll();
-    refreshFpsViewer(currTimeStamp);
-}
-
-var oldTimeStamp = new Date();
-function refreshFpsViewer(currTimeStamp) {
-    var deltaTime = currTimeStamp - oldTimeStamp;
-    fpsWebElement.innerHTML = (deltaTime == 0) ? 0 : Math.floor(( 1000 / deltaTime));
+    refreshModel(currTimeStamp - oldTimeStamp);
+    drawScene();
 
     oldTimeStamp = currTimeStamp;
+    window.requestAnimationFrame(gameLoop);
 }
 
 
-function refreshModel() {
-    collisionHandling()
-    playerLeft.refreshPosition();
-    playerRight.refreshPosition();
-    ball.refreshPosition();
+function drawScene() {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    rectangleManager.drawAll();
+}
+
+
+function refreshModel(deltaTime) {
+    if(!isNaN(deltaTime)) {
+        ball.refreshPosition(deltaTime);
+        playerLeft.refreshPosition(deltaTime);
+        playerRight.refreshPosition(deltaTime);
+        collisionHandling();
+    }
 }
 
 
@@ -237,6 +240,9 @@ function collisionHandling() {
     if(ball.isTouchingX(-630)) {
         ball.invertDirectionX();
     }
+
+
+
 
 }
 
@@ -291,7 +297,7 @@ PlayerObject()
 function PlayerObject() {
     this.PlayerIsMovingUp = false;
     this.PlayerIsMovingDown = false;
-    this.PlayerVelocityY = PLAYER_DEFAULT_VELOCITY; // Pixel per secound
+    this.PlayerVelocityY = PADDLES_DEFAULT_VELOCITY; // Pixel per second
     this.PlayerRectangleObject = null;
 
     this.setVelocity = function(newVelocity) {
@@ -303,9 +309,9 @@ function PlayerObject() {
             (newPosY > (this.PlayerRectangleObject.PosY - (this.PlayerRectangleObject.Height/2)))
     }
 
-    this.refreshPosition = function() {
+    this.refreshPosition = function(deltaTime) {
         if(this.PlayerRectangleObject != null) {
-            const moveDeltaY = (this.PlayerVelocityY / MODEL_REFRESH_RATE_PER_SECOUND);
+            const moveDeltaY = ((this.PlayerVelocityY * deltaTime) / 1000);
 
             if(this.PlayerIsMovingUp) {
                 this.PlayerRectangleObject.PosY += moveDeltaY;
@@ -358,9 +364,9 @@ function BallObject() {
             (newPosY > (this.BallRectangleObject.PosY - (this.BallRectangleObject.Height/2)))
     }
 
-    this.refreshPosition = function() {
-        const moveDeltaX = (this.VelocityX / MODEL_REFRESH_RATE_PER_SECOUND);
-        const moveDeltaY = (this.VelocityY / MODEL_REFRESH_RATE_PER_SECOUND);
+    this.refreshPosition = function(deltaTime) {
+        const moveDeltaX = ((this.VelocityX * deltaTime) / 1000);
+        const moveDeltaY = ((this.VelocityY * deltaTime) / 1000);
 
         if(this.BallRectangleObject != null) {
             this.BallRectangleObject.PosX += moveDeltaX;
@@ -387,6 +393,7 @@ function RectangleObject() {
     this.Width = 0;
     this.PosX = 0;
     this.PosY = 0;
+    this.ModelViewMatrix = mat3.create();
     this.isVisible = true;
 
     this.setPosition = function(newPosX, newPosY) {
@@ -399,111 +406,3 @@ function RectangleObject() {
         this.Width = newWidth;
     }
 }
-
-
-/*
-================
-Dictionary()
-================
-*/
-function Dictionary()
-{
-    this.arrDictionary = [];
-
-
-    /**
-     * Add new element to the dictionary.
-     * @param {String} sKey
-     * @param {Object} oObject
-     * @returns {boolean}
-     */
-    this.add = function(sKey, oObject)
-    {
-        if (sKey !== "" && sKey.constructor === String) {
-            for (var x = 0; x < this.arrDictionary.length; x++) {
-                if (this.arrDictionary[x]._sKey === sKey) {
-                    this.arrDictionary[x]._oObject = oObject;
-                    return true;
-                }
-            }
-
-            this.arrDictionary.push({_sKey : sKey, _oObject : oObject});
-            return true;
-        }
-
-        return false;
-    };
-
-
-    /**
-     * If exists, return object from dictionary element.
-     * @param {String} sKey
-     * @returns {Object}
-     */
-    this.get = function(Key)
-    {
-        if (Key.constructor === String) {
-            for (var x = 0; x < this.arrDictionary.length; x++) {
-                if(this.arrDictionary[x]._sKey === Key) {
-                    return this.arrDictionary[x]._oObject;
-                }
-            }
-        }
-
-        if (Key.constructor === Number) {
-            return this.arrDictionary[Key]._oObject;
-        }
-
-        return null;
-    };
-
-
-    /**
-     * Checks if dictionary entry already exists
-     * @param {String} sKey
-     * @returns {object}
-     */
-    this.containsKey = function(sKey)
-    {
-        if (sKey.constructor === String) {
-            for (var x = 0; x < this.arrDictionary.length; x++) {
-                if(this.arrDictionary[x]._sKey === sKey) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        return null;
-    };
-
-
-    /**
-     * @param {Number} iPosition
-     * @returns {String}
-     */
-    this.getKey = function(iPosition)
-    {
-        if (!isNaN(iPosition)) {
-            if (iPosition < this.arrDictionary.length) {
-                return this.arrDictionary[iPosition]._sKey;
-            }
-        }
-
-        return null;
-    };
-
-
-    /**
-     * Returns size of dictionary
-     * @returns {number}
-     */
-    this.count = function()
-    {
-        return this.arrDictionary.length;
-    };
-}
-
-
-
