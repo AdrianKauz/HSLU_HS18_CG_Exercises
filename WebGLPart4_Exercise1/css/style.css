@@ -1,0 +1,28 @@
+html, body {
+    background-color: rgb(0, 0, 0);
+    height:100%;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.title {
+    font-family: "Arial Black";
+    color: rgb(255, 255, 255);
+}
+
+.fps {
+    font-family: "Arial Black";
+    color: rgb(255, 255, 255);
+}
+
+#myCanvas {
+    border: 2px dotted rgb(255, 255, 255);
+}

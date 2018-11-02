@@ -197,10 +197,10 @@ function drawScene() {
 
 function refreshModel(deltaTime) {
     if(!isNaN(deltaTime)) {
+        collisionHandling();
         ball.refreshPosition(deltaTime);
         playerLeft.refreshPosition(deltaTime);
         playerRight.refreshPosition(deltaTime);
-        collisionHandling();
     }
 }
 
@@ -240,10 +240,6 @@ function collisionHandling() {
     if(ball.isTouchingX(-630)) {
         ball.invertDirectionX();
     }
-
-
-
-
 }
 
 
