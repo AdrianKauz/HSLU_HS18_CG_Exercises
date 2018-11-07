@@ -1,11 +1,4 @@
-//
-// DI Computer Graphics
-//
-// WebGL Exercises
-//
-
-// Constants
-
+import { WireFrameCube } from './WireFrameCube.js';
 
 
 // Register function to call after document has loaded
@@ -26,10 +19,7 @@ const ctx = {
 };
 
 // we keep all the parameters for drawing a specific object together
-const cubeObject = {
-    verticesBuffer: -1,
-    indicesBuffer: -1
-}
+let cubeObject = null;
 
 
 /**
@@ -42,6 +32,7 @@ function startup() {
     canvasWidth = canvas.width;
     gl = createGLContext(canvas);
     initGL();
+    cubeObject = new WireFrameCube(gl);
     draw();
 }
 
@@ -53,9 +44,9 @@ function initGL() {
     "use strict";
     ctx.shaderProgram = loadAndCompileShaders(gl, 'shaders/VertexShader.glsl', 'shaders/FragmentShader.glsl');
     setUpAttributesAndUniforms();
-    setUpWorldCoordinates();
+    //setUpWorldCoordinates();
     gl.clearColor(0.0, 0.0, 0.0, 1);
-    setUpBuffers();
+    //setUpBuffers();
 }
 
 
@@ -111,10 +102,13 @@ function draw() {
     "use strict";
     console.log("Drawing");
     gl.clear(gl.COLOR_BUFFER_BIT);
+    cubeObject.draw(gl, ctx.aVertexPositionId, ctx.uColorId)
+
+    /*
     gl.uniform4f(ctx.uColorId, 1.0, 0.0, 0.0, 1.0);
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeObject.verticesBuffer);
     gl.vertexAttribPointer(ctx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(ctx.aVertexPositionId);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeObject.indicesBuffer);
-    gl.drawElements(gl.LINES, 8, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.LINES, 8, gl.UNSIGNED_SHORT, 0);*/
 }
