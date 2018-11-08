@@ -1,32 +1,22 @@
 export function CartesianObject() {
-    this.ticks = 0;
-    this.color = [];
+    this.ticks = 10;
+    this.color = [0.7, 0.7, 0.7, 1.0];
     this.vertices = [];
     this.indices = [];
     this.bufferVertices = null;
     this.bufferEdges = null;
 
-
     this.setColor = function(newColor) {
         this.color = newColor;
     }
 
-    this.setDefaults = function() {
-        this.color = [1.0, 1.0, 1.0, 1.0];
-        this.ticks = 40;
-        this.vertices = generateVertices(this.ticks);
-        this.indices = generateIndices(this.ticks);
-        console.log(this.vertices);
-        console.log(this.indices);
-    }
-
-    this.defineGrid = function(newNumberOfTicks) {
+    this.setTicks = function(newNumberOfTicks) {
         this.ticks = newNumberOfTicks;
-        this.vertices = generateVertices(this.ticks);
-        this.indices = generateIndices(this.ticks);
     }
 
     this.init = function(gl) {
+        this.vertices = generateVertices(this.ticks);
+        this.indices = generateIndices(this.ticks);
         this.bufferVertices = setVerticesBuffer(gl, this.vertices);
         this.bufferEdges = setEdgesBuffer(gl, this.indices);
     }
@@ -75,35 +65,20 @@ export function CartesianObject() {
             pointsZAxis.push(0.0, 0.0, x * stepSize);
         }
 
-        //console.log(pointsXAxis);
-/*
-        let positiveValues = [];
-        let negativeValues = [];
-
-        for (let x = 1; x <= newNumberOfTicks; x++) {
-            positiveValues.push(x * stepSize);
-            negativeValues.push(x * -stepSize);
-        }
-
-        let axis = negativeValues.reverse();
-        axis.push(0);
-        axis = axis.concat(positiveValues)
-*/
         return pointsXAxis.concat(pointsYAxis).concat(pointsZAxis);
     }
 
 
     function generateIndices(newNumberOfTicks) {
         let indices = [];
-        // Für 3: +0, +7, +14
-        // Für 10: +0, +21, +42
-        // Für 40: +0, +81, +162
+        let offsetYVertices = newNumberOfTicks * 2 + 1;
+        let offsetZVertices = newNumberOfTicks * 4 + 2;
 
         for(let x = 0; x < newNumberOfTicks * 2; x++ ) {
             if (x % 2 == 0) {
                 indices.push(x, x + 1);
-                indices.push(x + 81, x + 82);
-                indices.push(x + 162, x + 163);
+                indices.push(x + offsetYVertices, x + offsetYVertices + 1);
+                indices.push(x + offsetZVertices, x + offsetZVertices + 1);
             }
         }
 

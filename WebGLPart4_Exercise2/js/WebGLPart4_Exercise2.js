@@ -1,5 +1,6 @@
 import { WireFrameCube } from './WireFrameCube.js';
 import { CartesianObject } from './CartesianObject.js';
+import { rgbToV4 } from './helper.js';
 
 // Register function to call after document has loaded
 window.onload = startup;
@@ -12,10 +13,10 @@ var canvasWidth = 0;
 
 const ctx = {
     shaderProgram: -1,
-    //uProjectionMatId: -1,
+    uProjectionMatId: -1,
     aVertexPositionId: -1,
     uColorId: -1,
-    uModelMatId: -1
+    uModelViewMat: -1
 };
 
 // we keep all the parameters for drawing a specific object together
@@ -32,12 +33,15 @@ function startup() {
     canvasWidth = canvas.width;
     gl = createGLContext(canvas);
     initGL();
-    cubeObject = new WireFrameCube(gl);
+
+    cubeObject = new WireFrameCube(gl, rgbToV4(0, 153, 255));
     cartesianObject = new CartesianObject();
-    cartesianObject.setDefaults();
+    cartesianObject.setColor(rgbToV4(255, 255, 255));
+    cartesianObject.setTicks(80);
     cartesianObject.init(gl);
 
-    setUpModelMatrix();
+    setUpModelViewMatrix();
+    setUpProjectionMatrix();
     draw();
 }
 
@@ -60,29 +64,30 @@ function setUpAttributesAndUniforms(){
     "use strict";
     ctx.aVertexPositionId = gl.getAttribLocation(ctx.shaderProgram, "aVertexPosition");
     ctx.uColorId = gl.getUniformLocation(ctx.shaderProgram, "uColor");
-    //ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMat");
-    ctx.uModelMatId = gl.getUniformLocation(ctx.shaderProgram, "uModelMat");
+    ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMat");
+    ctx.uModelViewMat = gl.getUniformLocation(ctx.shaderProgram, "uModelViewMat");
 }
 
-function setUpModelMatrix() {
-    let modelViewMatrix = mat4.create();
-    let cameraPosition = [0.1, 0.03, 0.02];
-    let cameraLookingAt = [0.0, 0.0, 0.0];
-    let cameraUp = [0.0, -1.0, 0.0];
+function setUpModelViewMatrix() {
+    const modelViewMatrix = mat4.create();
+    const cameraPosition = [1.00, 0.90, 1.40];
+    const cameraLookingAt = [0.0, 0.0, 0.0];
+    const cameraUp = [0.0, 1.0, 0.0];
 
-    mat4.lookAt(modelViewMatrix, cameraPosition, cameraLookingAt, cameraUp)
+    mat4.lookAt(modelViewMatrix, cameraPosition, cameraLookingAt, cameraUp);
+    gl.uniformMatrix4fv(ctx.uModelViewMat, false, modelViewMatrix);
+}
 
-    //let projection = mat4.create();
-    //projection = mat4.perspective(projection, Math.PI * 0.25, 1, 0.0001, 500)
+function setUpProjectionMatrix() {
+    const projectionMatrix = mat4.create();
+    const fieldOfView = 90 * Math.PI / 180;
+    const aspect = canvasWidth / canvasHeight;
+    const zNear = 0.01;
+    const zFar = 40.0;
 
+    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
-    //let final = mat4.multiply(projection, view);
-
-/*
-    mat4.perspective(modelMat, Math.PI * 0.25, 1, 0.0001, 500);
-    mat4.lookAt(modelMat, cameraPosition, cameraLookingAt, cameraUp);
-*/
-    gl.uniformMatrix4fv(ctx.uModelMatId, false, modelViewMatrix);
+    gl.uniformMatrix4fv(ctx.uProjectionMatId, false, projectionMatrix);
 }
 
 /**

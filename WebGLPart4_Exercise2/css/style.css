@@ -1,6 +1,7 @@
 html, body {
     background: rgb(0, 0, 0);
-    background-image: radial-gradient(circle at top right, rgb(69, 78, 111) 10%, transparent 80%),
+    background-image: url("../img/tile.png"),
+                      radial-gradient(circle at top right, rgb(69, 78, 111) 10%, transparent 80%),
                       radial-gradient(circle at bottom right, rgb(46,76,107) 10%, transparent 80%),
                       radial-gradient(circle at bottom left, rgb(43, 83, 87) 10%, transparent 80%),
                       radial-gradient(circle at top left, rgb(15, 20, 31) 10%, transparent 100%);
