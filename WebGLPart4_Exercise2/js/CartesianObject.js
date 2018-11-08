@@ -13,7 +13,7 @@ export function CartesianObject() {
 
     this.setDefaults = function() {
         this.color = [1.0, 1.0, 1.0, 1.0];
-        this.ticks = 10;
+        this.ticks = 40;
         this.vertices = generateVertices(this.ticks);
         this.indices = generateIndices(this.ticks);
         console.log(this.vertices);
@@ -65,17 +65,18 @@ export function CartesianObject() {
         const stepSize = (1 / newNumberOfTicks);
 
         let pointsXAxis = [];
-        //let pointsYAxis = [];
-        //let pointsZAxis = [];
+        let pointsYAxis = [];
+        let pointsZAxis = [];
 
         // X-Axis
-        for (let x = 0; x < newNumberOfTicks; x++) {
+        for (let x = -newNumberOfTicks; x <= newNumberOfTicks; x++) {
             pointsXAxis.push(x * stepSize, 0.0, 0.0);
-            //pointsYAxis.push(0.0, x * stepSize, 0.0);
-            //pointsZAxis.push(0.0, 0.0, x * stepSize);
+            pointsYAxis.push(0.0, x * stepSize, 0.0);
+            pointsZAxis.push(0.0, 0.0, x * stepSize);
         }
 
-
+        //console.log(pointsXAxis);
+/*
         let positiveValues = [];
         let negativeValues = [];
 
@@ -87,19 +88,22 @@ export function CartesianObject() {
         let axis = negativeValues.reverse();
         axis.push(0);
         axis = axis.concat(positiveValues)
-
-        return pointsXAxis//.concat(pointsYAxis).concat(pointsZAxis);
+*/
+        return pointsXAxis.concat(pointsYAxis).concat(pointsZAxis);
     }
 
 
     function generateIndices(newNumberOfTicks) {
-        let indices = []
+        let indices = [];
+        // Für 3: +0, +7, +14
+        // Für 10: +0, +21, +42
+        // Für 40: +0, +81, +162
 
-        for(let x = 0; x < newNumberOfTicks; x++ ) {
+        for(let x = 0; x < newNumberOfTicks * 2; x++ ) {
             if (x % 2 == 0) {
                 indices.push(x, x + 1);
-                //indices.push(x + 11, x + 12);
-                //indices.push(x + 22, x + 23);
+                indices.push(x + 81, x + 82);
+                indices.push(x + 162, x + 163);
             }
         }
 

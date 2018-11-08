@@ -66,7 +66,7 @@ function setUpAttributesAndUniforms(){
 
 function setUpModelMatrix() {
     let modelViewMatrix = mat4.create();
-    let cameraPosition = [0.11, 0.03, 0.05];
+    let cameraPosition = [0.1, 0.03, 0.02];
     let cameraLookingAt = [0.0, 0.0, 0.0];
     let cameraUp = [0.0, -1.0, 0.0];
 
