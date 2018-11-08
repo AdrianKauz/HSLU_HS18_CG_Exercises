@@ -1,5 +1,5 @@
 import { WireFrameCube } from './WireFrameCube.js';
-
+import { CartesianObject } from './CartesianObject.js';
 
 // Register function to call after document has loaded
 window.onload = startup;
@@ -12,7 +12,7 @@ var canvasWidth = 0;
 
 const ctx = {
     shaderProgram: -1,
-    uProjectionMatId: -1,
+    //uProjectionMatId: -1,
     aVertexPositionId: -1,
     uColorId: -1,
     uModelMatId: -1
@@ -20,7 +20,7 @@ const ctx = {
 
 // we keep all the parameters for drawing a specific object together
 let cubeObject = null;
-
+let cartesianObject = null;
 
 /**
  * Startup function to be called when the body is loaded
@@ -33,6 +33,11 @@ function startup() {
     gl = createGLContext(canvas);
     initGL();
     cubeObject = new WireFrameCube(gl);
+    cartesianObject = new CartesianObject();
+    cartesianObject.setDefaults();
+    cartesianObject.init(gl);
+
+    setUpModelMatrix();
     draw();
 }
 
@@ -44,9 +49,7 @@ function initGL() {
     "use strict";
     ctx.shaderProgram = loadAndCompileShaders(gl, 'shaders/VertexShader.glsl', 'shaders/FragmentShader.glsl');
     setUpAttributesAndUniforms();
-    //setUpWorldCoordinates();
     gl.clearColor(0.0, 0.0, 0.0, 1);
-    //setUpBuffers();
 }
 
 
@@ -57,43 +60,30 @@ function setUpAttributesAndUniforms(){
     "use strict";
     ctx.aVertexPositionId = gl.getAttribLocation(ctx.shaderProgram, "aVertexPosition");
     ctx.uColorId = gl.getUniformLocation(ctx.shaderProgram, "uColor");
-    ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMat");
-    //ctx.uModelMatId = gl.getUniformLocation(ctx.shaderProgram, "uModelMat");
+    //ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMat");
+    ctx.uModelMatId = gl.getUniformLocation(ctx.shaderProgram, "uModelMat");
 }
 
+function setUpModelMatrix() {
+    let modelViewMatrix = mat4.create();
+    let cameraPosition = [0.11, 0.03, 0.05];
+    let cameraLookingAt = [0.0, 0.0, 0.0];
+    let cameraUp = [0.0, -1.0, 0.0];
 
-function setUpBuffers(){
-    "use strict";
+    mat4.lookAt(modelViewMatrix, cameraPosition, cameraLookingAt, cameraUp)
 
-    const vertices = [ -0.25, -0.25, 0.0,  // v0
-                        0.25, -0.25, 0.0,  // v1
-                        0.25,  0.25, 0.0,  // v2
-                       -0.25,  0.25, 0.0]; // v3
+    //let projection = mat4.create();
+    //projection = mat4.perspective(projection, Math.PI * 0.25, 1, 0.0001, 500)
 
-    cubeObject.verticesBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeObject.verticesBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-    const vertexIndices = [ 0, 1,
-                            1, 2,
-                            2, 3,
-                            3, 0];
+    //let final = mat4.multiply(projection, view);
 
-    cubeObject.indicesBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeObject.indicesBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertexIndices), gl.STATIC_DRAW);
+/*
+    mat4.perspective(modelMat, Math.PI * 0.25, 1, 0.0001, 500);
+    mat4.lookAt(modelMat, cameraPosition, cameraLookingAt, cameraUp);
+*/
+    gl.uniformMatrix4fv(ctx.uModelMatId, false, modelViewMatrix);
 }
-
-
-/**
- *  Setup the world coordinates
- */
-function setUpWorldCoordinates() {
-    const projectionMat = mat4.create();
-    mat4.fromScaling(projectionMat, [2.0/gl.drawingBufferWidth, 2.0/gl.drawingBufferHeight]);
-    gl.uniformMatrix4fv(ctx.uProjectionMatId, false, projectionMat);
-}
-
 
 /**
  * Draw the scene.
@@ -103,12 +93,5 @@ function draw() {
     console.log("Drawing");
     gl.clear(gl.COLOR_BUFFER_BIT);
     cubeObject.draw(gl, ctx.aVertexPositionId, ctx.uColorId)
-
-    /*
-    gl.uniform4f(ctx.uColorId, 1.0, 0.0, 0.0, 1.0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeObject.verticesBuffer);
-    gl.vertexAttribPointer(ctx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(ctx.aVertexPositionId);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeObject.indicesBuffer);
-    gl.drawElements(gl.LINES, 8, gl.UNSIGNED_SHORT, 0);*/
+    cartesianObject.draw(gl, ctx.aVertexPositionId, ctx.uColorId)
 }
