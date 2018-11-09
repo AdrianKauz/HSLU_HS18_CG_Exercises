@@ -37,7 +37,7 @@ function startup() {
     cubeObject = new WireFrameCube(gl, rgbToV4(0, 153, 255));
     cartesianObject = new CartesianObject();
     cartesianObject.setColor(rgbToV4(255, 255, 255));
-    cartesianObject.setTicks(80);
+    cartesianObject.setTicks(40);
     cartesianObject.init(gl);
 
     setUpModelViewMatrix();
@@ -70,7 +70,7 @@ function setUpAttributesAndUniforms(){
 
 function setUpModelViewMatrix() {
     const modelViewMatrix = mat4.create();
-    const cameraPosition = [1.00, 0.90, 1.40];
+    const cameraPosition = [0.70, 0.90, 1.50];
     const cameraLookingAt = [0.0, 0.0, 0.0];
     const cameraUp = [0.0, 1.0, 0.0];
 
