@@ -18,8 +18,12 @@ export function KeyPressManager() {
         return keyMap;
     }
 
-    this.beginListening = function(newKey) {
-        keyMap.set(newKey, false);
+    this.beginListening = function() {
+        for(let x = 0; x < arguments.length; x++) {
+            if(Object.prototype.toString.call(arguments[x]) === "[object String]") {
+                keyMap.set(arguments[x], false);
+            }
+        }
     }
 
 

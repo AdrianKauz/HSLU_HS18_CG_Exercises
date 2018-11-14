@@ -1,7 +1,7 @@
 import { WireFrameCube } from './WireFrameCube.js';
 import { CartesianObject } from './CartesianObject.js';
-import { rgbToV4 } from './HelperFunctions.js';
-import { KeyPressManager } from './KeyPressManager.js';
+import { rgbToV4 } from '../../js/HelperFunctions.js';
+import { KeyPressManager } from '../../js/KeyPressManager.js';
 import { ModelViewMatrix } from './ModelViewMatrix.js';
 
 // Register function to call after document has loaded
@@ -43,17 +43,13 @@ function startup() {
     cubeObject = new WireFrameCube(gl, rgbToV4(0, 153, 255));
     cartesianObject = new CartesianObject();
     cartesianObject.setColor(rgbToV4(255, 255, 255));
-    cartesianObject.setTicks(40);
+    cartesianObject.setTicks(60);
     cartesianObject.init(gl);
 
-    keyPressManager.beginListening('ArrowLeft');
-    keyPressManager.beginListening('ArrowRight');
-    keyPressManager.beginListening('ArrowUp');
-    keyPressManager.beginListening('ArrowDown');
+    keyPressManager.beginListening('ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '-');
 
-    modelViewMatrix.updateMatrix(gl, ctx.uModelViewMat);
+    modelViewMatrix.updateVertexShader(gl, ctx.uModelViewMat);
 
-    //setUpModelViewMatrix();
     setUpProjectionMatrix();
     animationLoop();
 }
@@ -80,25 +76,6 @@ function setUpAttributesAndUniforms(){
     ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMat");
     ctx.uModelViewMat = gl.getUniformLocation(ctx.shaderProgram, "uModelViewMat");
 }
-
-
-/*
-function setUpModelViewMatrix() {
-    const modelViewMatrix = mat4.create();
-    const cameraPosition = [0.80, 0.90, 1.00];
-    const cameraLookingAt = [0.0, 0.0, 0.0];
-    const cameraUp = [0.1, 1.0, 0.0];
-
-    mat4.lookAt(modelViewMatrix, cameraPosition, cameraLookingAt, cameraUp);
-    gl.uniformMatrix4fv(ctx.uModelViewMat, false, modelViewMatrix);
-}
-*/
-
-
-
-
-
-
 
 
 function setUpProjectionMatrix() {
@@ -129,23 +106,14 @@ function animationLoop(currTimeStamp) {
 
 
 function refreshScene(deltaTimeStamp) {
-    if(keyPressManager.isPressed('ArrowLeft')) {
-        modelViewMatrix.rotateLeft();
-    }
+    if(keyPressManager.isPressed('ArrowLeft')) { modelViewMatrix.rotateLeft(); }
+    if(keyPressManager.isPressed('ArrowRight')) { modelViewMatrix.rotateRight(); }
+    if(keyPressManager.isPressed('ArrowUp')) { modelViewMatrix.rotateUp(); }
+    if(keyPressManager.isPressed('ArrowDown')) { modelViewMatrix.rotateDown(); }
+    if(keyPressManager.isPressed('+')) { modelViewMatrix.zoomIn(); }
+    if(keyPressManager.isPressed('-')) { modelViewMatrix.zoomOut(); }
 
-    if(keyPressManager.isPressed('ArrowRight')) {
-        modelViewMatrix.rotateRight();
-    }
-
-    if(keyPressManager.isPressed('ArrowUp')) {
-        modelViewMatrix.rotateUp();
-    }
-
-    if(keyPressManager.isPressed('ArrowDown')) {
-        modelViewMatrix.rotateDown();
-    }
-
-    modelViewMatrix.updateMatrix(gl, ctx.uModelViewMat);
+    modelViewMatrix.updateVertexShader(gl, ctx.uModelViewMat);
 }
 
 
@@ -154,7 +122,6 @@ function refreshScene(deltaTimeStamp) {
  */
 function drawScene() {
     "use strict";
-    //console.log("Drawing");
     gl.clear(gl.COLOR_BUFFER_BIT);
     cubeObject.draw(gl, ctx.aVertexPositionId, ctx.uColorId)
     cartesianObject.draw(gl, ctx.aVertexPositionId, ctx.uColorId)

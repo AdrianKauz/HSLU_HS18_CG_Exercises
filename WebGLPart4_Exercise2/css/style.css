@@ -24,6 +24,12 @@ html, body {
     text-shadow: 2px 2px 4px rgb(0, 0, 0);
 }
 
+.description {
+    font-family: "Courier New", Courier, monospace;
+    color: rgb(255, 255, 255);
+    text-shadow: 2px 2px 4px rgb(0, 0, 0);
+}
+
 .fps {
     font-family: "Arial Black";
     color: rgb(255, 255, 255);

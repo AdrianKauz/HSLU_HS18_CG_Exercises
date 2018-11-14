@@ -1,47 +1,66 @@
 export function ModelViewMatrix() {
     let currentMatrix = null;
     let distanceMultiplicator = 1.3;
-    let currentposition = [1.00, 1.00, 1.00];
+    let currentPosition = [1.00, 0.60, 1.00];
     let lookAtPosition = [0.0, 0.0, 0.0];
     let up = [0.0, 1.0, 0.0];
-    let refreshMatrix = true;
+    refreshMatrix();
 
-    this.updateMatrix = function(gl, matrixLocation) {
-        if(refreshMatrix) {
-            currentMatrix = mat4.create();
-
-            mat4.lookAt(currentMatrix,
-                        [
-                            Math.sin(currentposition[0]) * distanceMultiplicator * Math.abs(Math.cos(currentposition[1])),
-                            Math.sin(currentposition[1]) * distanceMultiplicator,
-                            Math.cos(currentposition[2]) * distanceMultiplicator * Math.abs(Math.cos(currentposition[1]))
-                        ],
-                        lookAtPosition,
-                        up);
-            gl.uniformMatrix4fv(matrixLocation, false, currentMatrix);
-            refreshMatrix = false;
-        }
+    this.updateVertexShader = function(gl, matrixLocation) {
+        gl.uniformMatrix4fv(matrixLocation, false, currentMatrix);
     }
 
     this.rotateLeft = function() {
-        currentposition[0] += 0.010;
-        currentposition[2] += 0.010;
-        refreshMatrix = true;
+        currentPosition[0] += 0.010;
+        currentPosition[2] += 0.010;
+        refreshMatrix();
     }
 
     this.rotateRight = function() {
-        currentposition[0] -= 0.010;
-        currentposition[2] -= 0.010;
-        refreshMatrix = true;
+        currentPosition[0] -= 0.010;
+        currentPosition[2] -= 0.010;
+        refreshMatrix();
     }
 
     this.rotateUp = function() {
-        currentposition[1] += 0.010;
-        refreshMatrix = true;
+        currentPosition[1] += 0.010;
+        up[1] = (Math.cos(currentPosition[1]) > 0) ? 1 : -1;
+
+        refreshMatrix();
     }
 
     this.rotateDown = function() {
-        currentposition[1] -= 0.010;
-        refreshMatrix = true;
+        currentPosition[1] -= 0.010;
+        up[1] = (Math.cos(currentPosition[1]) > 0) ? 1 : -1;
+        refreshMatrix();
+    }
+
+    this.zoomIn = function() {
+        if(distanceMultiplicator > 0.1) {
+            distanceMultiplicator -= 0.01;
+        }
+
+        refreshMatrix();
+    }
+
+    this.zoomOut = function() {
+        if(distanceMultiplicator < 5) {
+            distanceMultiplicator += 0.01;
+        }
+
+        refreshMatrix();
+    }
+
+    function refreshMatrix() {
+        currentMatrix = mat4.create();
+
+        mat4.lookAt(currentMatrix,
+            [
+                Math.sin(currentPosition[0]) * distanceMultiplicator * Math.cos(currentPosition[1]),
+                Math.sin(currentPosition[1]) * distanceMultiplicator,
+                Math.cos(currentPosition[2]) * distanceMultiplicator * Math.cos(currentPosition[1])
+            ],
+            lookAtPosition,
+            up);
     }
 }
