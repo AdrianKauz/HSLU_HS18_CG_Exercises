@@ -1,15 +1,21 @@
 import { WireFrameCube } from './WireFrameCube.js';
 import { CartesianObject } from './CartesianObject.js';
-import { rgbToV4 } from './helper.js';
+import { rgbToV4 } from './HelperFunctions.js';
+import { KeyPressManager } from './KeyPressManager.js';
+import { ModelViewMatrix } from './ModelViewMatrix.js';
 
 // Register function to call after document has loaded
 window.onload = startup;
 
 // Globals
-var gl;
+let gl = null;
+let cubeObject = null;
+let cartesianObject = null;
 
-var canvasHeight = 0;
-var canvasWidth = 0;
+let canvasHeight = 0;
+let canvasWidth = 0;
+const keyPressManager = new KeyPressManager();
+const modelViewMatrix = new ModelViewMatrix();
 
 const ctx = {
     shaderProgram: -1,
@@ -19,9 +25,9 @@ const ctx = {
     uModelViewMat: -1
 };
 
-// we keep all the parameters for drawing a specific object together
-let cubeObject = null;
-let cartesianObject = null;
+let rotationRight = false;
+let rotationLeft = false;
+
 
 /**
  * Startup function to be called when the body is loaded
@@ -40,9 +46,16 @@ function startup() {
     cartesianObject.setTicks(40);
     cartesianObject.init(gl);
 
-    setUpModelViewMatrix();
+    keyPressManager.beginListening('ArrowLeft');
+    keyPressManager.beginListening('ArrowRight');
+    keyPressManager.beginListening('ArrowUp');
+    keyPressManager.beginListening('ArrowDown');
+
+    modelViewMatrix.updateMatrix(gl, ctx.uModelViewMat);
+
+    //setUpModelViewMatrix();
     setUpProjectionMatrix();
-    draw();
+    animationLoop();
 }
 
 
@@ -68,19 +81,29 @@ function setUpAttributesAndUniforms(){
     ctx.uModelViewMat = gl.getUniformLocation(ctx.shaderProgram, "uModelViewMat");
 }
 
+
+/*
 function setUpModelViewMatrix() {
     const modelViewMatrix = mat4.create();
-    const cameraPosition = [0.70, 0.90, 1.50];
+    const cameraPosition = [0.80, 0.90, 1.00];
     const cameraLookingAt = [0.0, 0.0, 0.0];
-    const cameraUp = [0.0, 1.0, 0.0];
+    const cameraUp = [0.1, 1.0, 0.0];
 
     mat4.lookAt(modelViewMatrix, cameraPosition, cameraLookingAt, cameraUp);
     gl.uniformMatrix4fv(ctx.uModelViewMat, false, modelViewMatrix);
 }
+*/
+
+
+
+
+
+
+
 
 function setUpProjectionMatrix() {
     const projectionMatrix = mat4.create();
-    const fieldOfView = 90 * Math.PI / 180;
+    const fieldOfView = Math.PI * 0.5;
     const aspect = canvasWidth / canvasHeight;
     const zNear = 0.01;
     const zFar = 40.0;
@@ -90,12 +113,48 @@ function setUpProjectionMatrix() {
     gl.uniformMatrix4fv(ctx.uProjectionMatId, false, projectionMatrix);
 }
 
+
+let oldTimeStamp = null;
+function animationLoop(currTimeStamp) {
+    if(oldTimeStamp == null) {
+        oldTimeStamp = currTimeStamp;
+    }
+
+    refreshScene(currTimeStamp - oldTimeStamp);
+    drawScene();
+
+    oldTimeStamp = currTimeStamp;
+    window.requestAnimationFrame(animationLoop);
+}
+
+
+function refreshScene(deltaTimeStamp) {
+    if(keyPressManager.isPressed('ArrowLeft')) {
+        modelViewMatrix.rotateLeft();
+    }
+
+    if(keyPressManager.isPressed('ArrowRight')) {
+        modelViewMatrix.rotateRight();
+    }
+
+    if(keyPressManager.isPressed('ArrowUp')) {
+        modelViewMatrix.rotateUp();
+    }
+
+    if(keyPressManager.isPressed('ArrowDown')) {
+        modelViewMatrix.rotateDown();
+    }
+
+    modelViewMatrix.updateMatrix(gl, ctx.uModelViewMat);
+}
+
+
 /**
  * Draw the scene.
  */
-function draw() {
+function drawScene() {
     "use strict";
-    console.log("Drawing");
+    //console.log("Drawing");
     gl.clear(gl.COLOR_BUFFER_BIT);
     cubeObject.draw(gl, ctx.aVertexPositionId, ctx.uColorId)
     cartesianObject.draw(gl, ctx.aVertexPositionId, ctx.uColorId)
