@@ -25,9 +25,6 @@ const ctx = {
     uModelViewMat: -1
 };
 
-let rotationRight = false;
-let rotationLeft = false;
-
 
 /**
  * Startup function to be called when the body is loaded
@@ -90,22 +87,15 @@ function setUpProjectionMatrix() {
     gl.uniformMatrix4fv(ctx.uProjectionMatId, false, projectionMatrix);
 }
 
-
-let oldTimeStamp = null;
-function animationLoop(currTimeStamp) {
-    if(oldTimeStamp == null) {
-        oldTimeStamp = currTimeStamp;
-    }
-
-    refreshScene(currTimeStamp - oldTimeStamp);
+function animationLoop() {
+    refreshScene();
     drawScene();
 
-    oldTimeStamp = currTimeStamp;
     window.requestAnimationFrame(animationLoop);
 }
 
 
-function refreshScene(deltaTimeStamp) {
+function refreshScene() {
     if(keyPressManager.isPressed('ArrowLeft')) { modelViewMatrix.rotateLeft(); }
     if(keyPressManager.isPressed('ArrowRight')) { modelViewMatrix.rotateRight(); }
     if(keyPressManager.isPressed('ArrowUp')) { modelViewMatrix.rotateUp(); }

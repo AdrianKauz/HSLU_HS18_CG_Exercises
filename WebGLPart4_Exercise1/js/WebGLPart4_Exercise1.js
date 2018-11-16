@@ -12,17 +12,16 @@
 window.onload = startup;
 
 // Globals
-var gl;
+let gl;
 
-var canvasHeight = 0;
-var canvasWidth = 0;
+let canvasHeight = 0;
+let canvasWidth = 0;
 
 const ctx = {
     shaderProgram: -1,
     uProjectionMatId: -1,
     aVertexPositionId: -1,
     uColorId: -1,
-    uModelMatId: -1
 };
 
 // we keep all the parameters for drawing a specific object together
@@ -67,7 +66,6 @@ function setUpAttributesAndUniforms(){
     ctx.aVertexPositionId = gl.getAttribLocation(ctx.shaderProgram, "aVertexPosition");
     ctx.uColorId = gl.getUniformLocation(ctx.shaderProgram, "uColor");
     ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMat");
-    //ctx.uModelMatId = gl.getUniformLocation(ctx.shaderProgram, "uModelMat");
 }
 
 
