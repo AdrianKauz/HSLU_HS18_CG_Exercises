@@ -1,4 +1,3 @@
-import { WireFrameCube } from './WireFrameCube.js';
 import { PolygonCube } from './PolygonCube.js';
 import { CartesianObject } from './CartesianObject.js';
 import { rgbToV4 } from '../../js/HelperFunctions.js';
@@ -22,7 +21,7 @@ const ctx = {
     shaderProgram: -1,
     uProjectionMatId: -1,
     aVertexPositionId: -1,
-    uColorId: -1,
+    aVertexColorId: -1,
     uModelViewMat: -1
 };
 
@@ -61,6 +60,7 @@ function initGL() {
     ctx.shaderProgram = loadAndCompileShaders(gl, 'shaders/VertexShader.glsl', 'shaders/FragmentShader.glsl');
     setUpAttributesAndUniforms();
     gl.clearColor(0.0, 0.0, 0.0, 1);
+    gl.clearDepth(1.0);
 }
 
 
@@ -70,9 +70,9 @@ function initGL() {
 function setUpAttributesAndUniforms(){
     "use strict";
     ctx.aVertexPositionId = gl.getAttribLocation(ctx.shaderProgram, "aVertexPosition");
-    ctx.uColorId = gl.getUniformLocation(ctx.shaderProgram, "uColor");
-    ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMat");
-    ctx.uModelViewMat = gl.getUniformLocation(ctx.shaderProgram, "uModelViewMat");
+    ctx.aVertexColorId = gl.getAttribLocation(ctx.shaderProgram, "aVertexColor");
+    ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMatrix");
+    ctx.uModelViewMat = gl.getUniformLocation(ctx.shaderProgram, "uModelViewMatrix");
 }
 
 
@@ -113,7 +113,10 @@ function refreshScene() {
  */
 function drawScene() {
     "use strict";
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    cubeObject.draw(gl, ctx.aVertexPositionId, ctx.uColorId)
-    cartesianObject.draw(gl, ctx.aVertexPositionId, ctx.uColorId)
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    cubeObject.draw(gl, ctx.aVertexPositionId, ctx.aVertexColorId)
+    cartesianObject.draw(gl, ctx.aVertexPositionId, ctx.aVertexColorId)
 }

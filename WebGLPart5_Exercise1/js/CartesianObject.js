@@ -23,11 +23,13 @@ export function CartesianObject() {
 
 
     this.draw = function(gl, aVertexPositionId, aVertexColorId) {
-        gl.uniform4fv(aVertexColorId, this.color);
+        gl.disableVertexAttribArray(aVertexColorId);
+        gl.vertexAttrib4fv(aVertexColorId, this.color);
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferVertices);
         gl.vertexAttribPointer(aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
-
         gl.enableVertexAttribArray(aVertexPositionId);
+
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufferEdges);
         gl.drawElements(gl.LINES, this.indices.length, gl.UNSIGNED_SHORT, 0);
     }
