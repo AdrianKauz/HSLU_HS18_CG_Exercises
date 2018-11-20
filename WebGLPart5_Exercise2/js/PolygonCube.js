@@ -55,19 +55,74 @@ export function PolygonCube(gl) {
        12, 13, 14,  12, 14, 15, // Bottom
        16, 17, 18,  16, 18, 19, // Right
        20, 21, 22,  20, 22, 23  // Left
-    ]
+    ];
+
+    let textureCoordinates = [
+        // Front Side
+        0.0,  0.0,
+        1.0,  0.0,
+        1.0,  1.0,
+        0.0,  1.0,
+
+        // Back Side
+        0.0,  0.0,
+        1.0,  0.0,
+        1.0,  1.0,
+        0.0,  1.0,
+
+        // Top Side
+        0.0,  0.0,
+        1.0,  0.0,
+        1.0,  1.0,
+        0.0,  1.0,
+
+        // Bottom Side
+        0.0,  0.0,
+        1.0,  0.0,
+        1.0,  1.0,
+        0.0,  1.0,
+
+        // Right Side
+        0.0,  0.0,
+        1.0,  0.0,
+        1.0,  1.0,
+        0.0,  1.0,
+
+        // Left Side
+        0.0,  0.0,
+        1.0,  0.0,
+        1.0,  1.0,
+        0.0,  1.0
+    ];
 
     let bufferVertices = defineVerticesBuffer(gl, vertices);
     let bufferIndices = defineIndicesBuffer(gl, indices);
     let bufferColors = defineColorsBuffer(gl, flattenArray2D(stretchArray(colors, 4)));
+    let bufferTextCoords = defineTextureCoordinates(gl, textureCoordinates);
 
-    this.draw = function(gl, aVertexPositionId, aVertexColorId) {
+
+    this.draw = function(gl, aVertexPositionId, aTextureCoordId, uSampler, texture) {
 
         // Vertices
+        gl.enableVertexAttribArray(aVertexPositionId);
         gl.bindBuffer(gl.ARRAY_BUFFER, bufferVertices);
         gl.vertexAttribPointer(aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(aVertexPositionId);
 
+
+        // Texture
+        gl.enableVertexAttribArray(aTextureCoordId);
+        gl.bindBuffer(gl.ARRAY_BUFFER, bufferTextCoords);
+        gl.vertexAttribPointer(aTextureCoordId, 2, gl.FLOAT, false, 0, 0);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.uniform1i(uSampler, 0);
+
+        // Indices
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufferIndices);
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+/*
         // Colors
         gl.bindBuffer(gl.ARRAY_BUFFER, bufferColors);
         gl.vertexAttribPointer(aVertexColorId, 4, gl.FLOAT, false, 0, 0);
@@ -75,7 +130,16 @@ export function PolygonCube(gl) {
 
         // Indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufferIndices);
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);*/
+    }
+
+
+    function defineTextureCoordinates(gl, textureCoordinates) {
+        const newBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, newBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
+
+        return newBuffer;
     }
 
 
