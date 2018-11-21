@@ -1,7 +1,7 @@
-import {flattenArray2D, rgbToV4, stretchArray} from "../../js/HelperFunctions.js";
+import {flattenArray2D, rgbToV4, rgbaToV4, stretchArray} from "../../js/HelperFunctions.js";
 
 export function PolygonCube(gl) {
-    let vertices = [
+    const vertices = [
         // Front Side
         -0.5, -0.5,  0.5, // 00
          0.5, -0.5,  0.5, // 01
@@ -39,7 +39,7 @@ export function PolygonCube(gl) {
         -0.5,  0.5, -0.5  // 23
     ];
 
-    let textureCoordinates = [
+    const textureCoordinates = [
         // Front Side
         1.0,  1.0,
         0.0,  1.0,
@@ -86,7 +86,7 @@ export function PolygonCube(gl) {
         rgbToV4(255, 153,  15)  // Left Side
     ];
 
-    let indices = [
+    const indices = [
         0,  1,  2,   0,  2,  3, // Front
         4,  5,  6,   4,  6,  7, // Back
         8,  9, 10,   8, 10, 11, // Top
@@ -95,39 +95,50 @@ export function PolygonCube(gl) {
        20, 21, 22,  20, 22, 23  // Left
     ];
 
+    const buffer = {
+        vertices : -1,
+        indices : -1,
+        colors : -1,
+        textCoords : -1
+    };
 
-    let bufferVertices = defineVerticesBuffer(gl, vertices);
-    let bufferIndices = defineIndicesBuffer(gl, indices);
-    let bufferColors = defineColorsBuffer(gl, flattenArray2D(stretchArray(colors, 4)));
-    let bufferTextCoords = defineTextureCoordinates(gl, textureCoordinates);
+
+    buffer.vertices = defineVerticesBuffer(gl, vertices);
+    buffer.indices = defineIndicesBuffer(gl, indices);
+    buffer.colors = defineColorsBuffer(gl, flattenArray2D(stretchArray(colors, 4)));
+    buffer.textCoords = defineTextureCoordinates(gl, textureCoordinates);
 
 
-    this.draw = function(gl, aVertexPositionId, aTextureCoordId, uSampler, texture) {
+    this.draw = function(gl, shaderContext, texture) {
         // Vertices
-        gl.enableVertexAttribArray(aVertexPositionId);
-        gl.bindBuffer(gl.ARRAY_BUFFER, bufferVertices);
-        gl.vertexAttribPointer(aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
-
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertices);
+        gl.enableVertexAttribArray(shaderContext.aVertexPositionId);
+        gl.vertexAttribPointer(shaderContext.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
 
         // Texture
-        gl.enableVertexAttribArray(aTextureCoordId);
-        gl.bindBuffer(gl.ARRAY_BUFFER, bufferTextCoords);
-        gl.vertexAttribPointer(aTextureCoordId, 2, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer.textCoords);
+        gl.enableVertexAttribArray(shaderContext.aTextureCoordId);
+        gl.vertexAttribPointer(shaderContext.aTextureCoordId, 2, gl.FLOAT, false, 0, 0);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.uniform1i(uSampler, 0);
-
-        // Indices
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufferIndices);
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
+        gl.uniform1i(shaderContext.uSampler, 0);
 /*
         // Colors
-        gl.bindBuffer(gl.ARRAY_BUFFER, bufferColors);
-        gl.vertexAttribPointer(aVertexColorId, 4, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(aVertexColorId);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer.colors);
+        gl.enableVertexAttribArray(shaderContext.aVertexColorId);
+        gl.vertexAttribPointer(shaderContext.aVertexColorId, 4, gl.FLOAT, false, 0, 0);
+*/
 
+        // Indices
+        gl.vertexAttrib4fv(shaderContext.aVertexColorId, rgbaToV4(0, 0, 0, 0.0));
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+
+
+
+/*
         // Indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufferIndices);
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);*/
@@ -168,5 +179,4 @@ export function PolygonCube(gl) {
 
         return newBuffer;
     }
-
 }

@@ -22,6 +22,7 @@ const ctx = {
     uProjectionMatId: -1,
     aVertexPositionId: -1,
     aTextureCoordId: -1,
+    aVertexColorId: -1,
     uModelViewMat: -1,
     uSampler: -1
 };
@@ -76,6 +77,7 @@ function setUpAttributesAndUniforms(){
     "use strict";
     ctx.aVertexPositionId = gl.getAttribLocation(ctx.shaderProgram, 'aVertexPosition');
     ctx.aTextureCoordId =   gl.getAttribLocation(ctx.shaderProgram, 'aTextureCoord');
+    ctx.aVertexColorId = gl.getAttribLocation(ctx.shaderProgram, "aVertexColor");
 
     ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, 'uProjectionMatrix');
     ctx.uModelViewMat = gl.getUniformLocation(ctx.shaderProgram, 'uModelViewMatrix');
@@ -106,7 +108,7 @@ function loadTexture(gl, url) {
     const border = 0;
     const srcFormat = gl.RGBA;
     const srcType = gl.UNSIGNED_BYTE;
-    const pixel = new Uint8Array([0, 0, 0, 255]);
+    const pixel = new Uint8Array([255, 0, 0, 255]);
     gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, border, srcFormat, srcType, pixel);
 
     const image = new Image()
@@ -116,6 +118,7 @@ function loadTexture(gl, url) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);
+        gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
     image.src = url;
@@ -124,12 +127,16 @@ function loadTexture(gl, url) {
 }
 
 
-
+let counter = 0;
 function animationLoop() {
     refreshScene();
     drawScene();
+return;
+    //window.requestAnimationFrame(animationLoop);
 
-    window.requestAnimationFrame(animationLoop);
+    if (counter++ < 5) {
+        window.requestAnimationFrame(animationLoop);
+    }
 }
 
 
@@ -154,6 +161,7 @@ function drawScene() {
     gl.depthFunc(gl.LEQUAL);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    cubeObject.draw(gl, ctx.aVertexPositionId, ctx.aTextureCoordId, ctx.uSampler, texBuffer[0]);
-    //cartesianObject.draw(gl, ctx.aVertexPositionId, ctx.aVertexColorId)
+    cartesianObject.draw(gl, ctx);
+    cubeObject.draw(gl, ctx, texBuffer[0]);
+
 }
