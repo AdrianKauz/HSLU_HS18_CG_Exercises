@@ -131,6 +131,7 @@ let counter = 0;
 function animationLoop() {
     refreshScene();
     drawScene();
+    drawScene();
 return;
     //window.requestAnimationFrame(animationLoop);
 
@@ -161,7 +162,7 @@ function drawScene() {
     gl.depthFunc(gl.LEQUAL);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+
     cartesianObject.draw(gl, ctx);
     cubeObject.draw(gl, ctx, texBuffer[0]);
-
 }

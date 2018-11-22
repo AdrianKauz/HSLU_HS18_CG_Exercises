@@ -32,7 +32,7 @@ export function CartesianObject() {
         gl.vertexAttrib4fv(shaderContext.aVertexColorId, color);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertices);
-        //gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+        //gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, 0, new Uint16Array(indices));
         gl.enableVertexAttribArray(shaderContext.aVertexPositionId);
         gl.vertexAttribPointer(shaderContext.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
 
