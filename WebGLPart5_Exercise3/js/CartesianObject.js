@@ -40,6 +40,10 @@ export function CartesianObject() {
         //console.log(vertices);
         //console.log(indices);
         gl.drawElements(gl.LINES, indices.length, gl.UNSIGNED_SHORT, 0);
+
+
+        // Disable
+        gl.disableVertexAttribArray(shaderContext.aVertexPositionId);
     }
 
 

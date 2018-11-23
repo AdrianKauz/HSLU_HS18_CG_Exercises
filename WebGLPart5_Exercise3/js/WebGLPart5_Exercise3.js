@@ -44,7 +44,7 @@ function startup() {
     cubeObject = new PolygonCube(gl);
     cartesianObject = new CartesianObject();
     cartesianObject.setColor(rgbToV4(255, 255, 255));
-    cartesianObject.setTicks(60);
+    cartesianObject.setTicks(80);
     cartesianObject.init(gl);
 
     keyPressManager.beginListening('ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '-');
@@ -127,17 +127,11 @@ function loadTexture(gl, url) {
 }
 
 
-let counter = 0;
 function animationLoop() {
     refreshScene();
     drawScene();
-    drawScene();
-return;
-    //window.requestAnimationFrame(animationLoop);
 
-    if (counter++ < 5) {
-        window.requestAnimationFrame(animationLoop);
-    }
+    window.requestAnimationFrame(animationLoop);
 }
 
 

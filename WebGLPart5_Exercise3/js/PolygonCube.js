@@ -116,9 +116,9 @@ export function PolygonCube(gl) {
         gl.vertexAttribPointer(shaderContext.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
 
         // Texture
-/*       gl.bindBuffer(gl.ARRAY_BUFFER, buffer.textCoords);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer.textCoords);
         gl.enableVertexAttribArray(shaderContext.aTextureCoordId);
-        gl.vertexAttribPointer(shaderContext.aTextureCoordId, 2, gl.FLOAT, false, 0, 0);*/
+        gl.vertexAttribPointer(shaderContext.aTextureCoordId, 2, gl.FLOAT, false, 0, 0);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -135,6 +135,10 @@ export function PolygonCube(gl) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
+        // Disable
+        gl.disableVertexAttribArray(shaderContext.aVertexPositionId);
+        gl.disableVertexAttribArray(shaderContext.aTextureCoordId);
+        gl.disableVertexAttribArray(shaderContext.aVertexPositionId);
 
 
 
