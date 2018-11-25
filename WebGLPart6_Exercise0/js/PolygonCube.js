@@ -5,13 +5,18 @@ export function PolygonCube(gl) {
         aVertexPositionId : -1,
         aVertexColorId : -1,
         aTextureCoordId : -1,
+        uModelMatrixId : -1,
         texture : null,
         buffer : {
             vertices : -1,
             indices : -1,
             colors : -1,
             textCoords : -1
-        }
+        },
+        modelMatrix : null,
+        scaling : [1.0, 1.0, 1.0],
+        position : [0.0, 0.0, 0.0],
+        rotation : [0.0, 0.0, 0.0]
     }
 
     let drawTexture = false;
@@ -116,38 +121,56 @@ export function PolygonCube(gl) {
     ctx.buffer.colors = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(flattenArray2D(stretchArray(colors, 4))), gl.STATIC_DRAW);
     ctx.buffer.textCoords = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
 
-
     this.setVertexPositionId = function(newVertexPositionId) {
         ctx.aVertexPositionId = newVertexPositionId;
-    }
+    };
 
 
     this.setVertexColorId = function(newVertexColorId) {
         ctx.aVertexColorId = newVertexColorId;
-    }
+    };
 
 
     this.setTextureCoordId = function(newTextureCoordId) {
         ctx.aTextureCoordId = newTextureCoordId;
-    }
+    };
+
+
+    this.setModelMatrixId = function(newModelMatrixId) {
+        ctx.uModelMatrixId = newModelMatrixId;
+    };
 
 
     this.setTexture = function(newTexture) {
         ctx.texture = newTexture;
-    }
+    };
+
+
+    this.setScaling = function(newXScale, newYScale, newZScale) {
+        ctx.scaling = [newXScale, newYScale, newZScale];
+    };
+
+
+    this.moveTo = function(newPosX, newPosY, newPosZ) {
+        ctx.position = [newPosX, newPosY, newPosZ];
+    };
 
 
     this.enableTexture = function() {
         drawTexture = true;
-    }
+    };
 
 
     this.disableTexture = function() {
         drawTexture = false;
-    }
+    };
 
 
     this.draw = function(gl) {
+        // Set ModelMatrix
+        refreshModelMatrix();
+        gl.uniformMatrix4fv(ctx.uModelMatrixId, false, ctx.modelMatrix);
+
         // Vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.vertices);
         gl.enableVertexAttribArray(ctx.aVertexPositionId);
@@ -183,5 +206,28 @@ export function PolygonCube(gl) {
 
         gl.enableVertexAttribArray(ctx.aVertexPositionId);
         gl.disableVertexAttribArray(ctx.aVertexColorId);
-    }
+    };
+
+
+    function refreshModelMatrix() {
+        ctx.modelMatrix = mat4.create();
+
+        if((ctx.rotation[0] !== 1.0) && (ctx.rotation[1] !== 1.0) && (ctx.rotation[2] !== 1.0)) {
+            mat4.scale(ctx.modelMatrix,ctx.modelMatrix, ctx.scaling);
+        }
+
+        if(ctx.rotation[0] !== 0.0) {
+            mat4.rotateX(ctx.modelMatrix,ctx.modelMatrix, ctx.rotation[0]);
+        }
+
+        if(ctx.rotation[1] !== 0.0) {
+            mat4.rotateY(ctx.modelMatrix,ctx.modelMatrix, ctx.rotation[1]);
+        }
+
+        if(ctx.rotation[2] !== 0.0) {
+            mat4.rotateZ(ctx.modelMatrix,ctx.modelMatrix, ctx.rotation[2]);
+        }
+
+        mat4.translate(ctx.modelMatrix,ctx.modelMatrix, ctx.position);
+    };
 }

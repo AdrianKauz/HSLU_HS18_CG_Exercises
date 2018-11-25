@@ -6,6 +6,11 @@ export function CartesianObject() {
     let vertices = [];
     let indices = [];
 
+    const ctx = {
+        uModelMatrixId : -1,
+        modelMatrix : null,
+    }
+
     const buffer = {
         vertices : -1,
         edges : -1
@@ -21,6 +26,9 @@ export function CartesianObject() {
         this.ticks = newNumberOfTicks;
     }
 
+    this.setModelMatrixId = function(newModelMatrixId) {
+        ctx.uModelMatrixId = newModelMatrixId;
+    }
 
     this.init = function(gl) {
         vertices = generateVertices(this.ticks);
@@ -31,6 +39,10 @@ export function CartesianObject() {
 
 
     this.draw = function(gl, shaderContext) {
+        // Set ModelMatrix
+        refreshModelMatrix();
+        gl.uniformMatrix4fv(ctx.uModelMatrixId, false, ctx.modelMatrix);
+
         // Define color
         gl.vertexAttrib4fv(shaderContext.aVertexColorId, color);
 
@@ -78,5 +90,10 @@ export function CartesianObject() {
         }
 
         return indices;
+    }
+
+
+    function refreshModelMatrix() {
+        ctx.modelMatrix = mat4.create();
     }
 }

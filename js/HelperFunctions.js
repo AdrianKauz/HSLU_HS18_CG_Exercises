@@ -26,3 +26,11 @@ export function stretchArray(array, n) {
 export function flattenArray2D(array) {
     return [].concat.apply([], array);
 }
+
+export function defineNewBuffer(gl, newArrayType, newDataArray, newUsageType) {
+    const newBuffer = gl.createBuffer();
+    gl.bindBuffer(newArrayType, newBuffer);
+    gl.bufferData(newArrayType, newDataArray, newUsageType);
+
+    return newBuffer;
+}

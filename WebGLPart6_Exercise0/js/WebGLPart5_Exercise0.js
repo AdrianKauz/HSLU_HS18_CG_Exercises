@@ -2,7 +2,7 @@ import { PolygonCube } from './PolygonCube.js';
 import { CartesianObject } from './CartesianObject.js';
 import { rgbToV4, rgbaToV4 } from '../../js/HelperFunctions.js';
 import { KeyPressManager } from '../../js/KeyPressManager.js';
-import { ModelViewMatrix } from './ModelViewMatrix.js';
+import { CameraViewMatrix } from './CameraViewMatrix.js';
 
 // Register function to call after document has loaded
 window.onload = startup;
@@ -15,7 +15,7 @@ let cartesianObject = null;
 let canvasHeight = 0;
 let canvasWidth = 0;
 const keyPressManager = new KeyPressManager();
-const modelViewMatrix = new ModelViewMatrix();
+const cameraViewMatrix = new CameraViewMatrix();
 
 const ctx = {
     shaderProgram: -1,
@@ -23,7 +23,8 @@ const ctx = {
     aVertexPositionId: -1,
     aTextureCoordId: -1,
     aVertexColorId: -1,
-    uModelViewMat: -1,
+    uModelMatrixId: -1,
+    uCameraViewMatrix: -1,
     uSampler: -1
 };
 
@@ -43,22 +44,25 @@ function startup() {
 
     texBuffer[0] = loadTexture(gl, "./img/lena_512x512.png");
 
-
     cubeObject = new PolygonCube(gl);
     cubeObject.setTextureCoordId(ctx.aTextureCoordId);
     cubeObject.setVertexColorId(ctx.aVertexColorId);
     cubeObject.setVertexPositionId(ctx.aVertexPositionId);
+    cubeObject.setModelMatrixId(ctx.uModelMatrixId);
     cubeObject.setTexture(texBuffer[0]);
     cubeObject.enableTexture();
+    cubeObject.setScaling(1.0, 1.0, 1.0);
+    cubeObject.moveTo(0.0, 0.0, 0.0);
 
     cartesianObject = new CartesianObject();
+    cartesianObject.setModelMatrixId(ctx.uModelMatrixId);
     cartesianObject.setColor(rgbToV4(255, 255, 255));
     cartesianObject.setTicks(80);
     cartesianObject.init(gl);
 
     keyPressManager.beginListening('ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '-');
 
-    modelViewMatrix.updateVertexShader(gl, ctx.uModelViewMat);
+    cameraViewMatrix.updateShader(gl, ctx.uCameraViewMatrix);
 
     setUpProjectionMatrix();
     animationLoop();
@@ -86,8 +90,9 @@ function setUpAttributesAndUniforms(){
     ctx.aTextureCoordId =   gl.getAttribLocation(ctx.shaderProgram, 'aTextureCoord');
     ctx.aVertexColorId = gl.getAttribLocation(ctx.shaderProgram, "aVertexColor");
 
+    ctx.uCameraViewMatrix = gl.getUniformLocation(ctx.shaderProgram, 'uCameraViewMatrix');
     ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, 'uProjectionMatrix');
-    ctx.uModelViewMat = gl.getUniformLocation(ctx.shaderProgram, 'uModelViewMatrix');
+    ctx.uModelMatrixId = gl.getUniformLocation(ctx.shaderProgram, 'uModelMatrix');
     ctx.uSampler = gl.getUniformLocation(ctx.shaderProgram, 'uSampler');
 }
 
@@ -125,7 +130,6 @@ function loadTexture(gl, url) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);
-        gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
     image.src = url;
@@ -143,14 +147,14 @@ function animationLoop() {
 
 
 function refreshScene() {
-    if(keyPressManager.isPressed('ArrowLeft')) { modelViewMatrix.rotateLeft(); }
-    if(keyPressManager.isPressed('ArrowRight')) { modelViewMatrix.rotateRight(); }
-    if(keyPressManager.isPressed('ArrowUp')) { modelViewMatrix.rotateUp(); }
-    if(keyPressManager.isPressed('ArrowDown')) { modelViewMatrix.rotateDown(); }
-    if(keyPressManager.isPressed('+')) { modelViewMatrix.zoomIn(); }
-    if(keyPressManager.isPressed('-')) { modelViewMatrix.zoomOut(); }
+    if(keyPressManager.isPressed('ArrowLeft')) { cameraViewMatrix.rotateLeft(); }
+    if(keyPressManager.isPressed('ArrowRight')) { cameraViewMatrix.rotateRight(); }
+    if(keyPressManager.isPressed('ArrowUp')) { cameraViewMatrix.rotateUp(); }
+    if(keyPressManager.isPressed('ArrowDown')) { cameraViewMatrix.rotateDown(); }
+    if(keyPressManager.isPressed('+')) { cameraViewMatrix.zoomIn(); }
+    if(keyPressManager.isPressed('-')) { cameraViewMatrix.zoomOut(); }
 
-    modelViewMatrix.updateVertexShader(gl, ctx.uModelViewMat);
+    cameraViewMatrix.updateShader(gl, ctx.uCameraViewMatrix);
 }
 
 
