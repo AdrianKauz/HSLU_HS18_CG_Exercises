@@ -28,7 +28,8 @@ const ctx = {
     aVertexColorId: -1,
     uModelMatrixId: -1,
     uCameraViewMatrix: -1,
-    uSampler: -1
+    uSampler: -1,
+    uTextureModeOn: -1
 };
 
 let texBuffer = [1];
@@ -65,6 +66,7 @@ function startup() {
     rightCube.setVertexColorId(ctx.aVertexColorId);
     rightCube.setVertexPositionId(ctx.aVertexPositionId);
     rightCube.setModelMatrixId(ctx.uModelMatrixId);
+    rightCube.setSampler(ctx.uSampler);
     rightCube.setTexture(texBuffer[0]);
     rightCube.enableTexture();
     rightCube.setScaling(0.25, 0.25, 0.25);
@@ -117,6 +119,7 @@ function setUpAttributesAndUniforms(){
     ctx.uProjectionMatId = gl.getUniformLocation(ctx.shaderProgram, 'uProjectionMatrix');
     ctx.uModelMatrixId = gl.getUniformLocation(ctx.shaderProgram, 'uModelMatrix');
     ctx.uSampler = gl.getUniformLocation(ctx.shaderProgram, 'uSampler');
+    ctx.uTextureModeOn = gl.getUniformLocation(ctx.shaderProgram, 'uTextureModeOn');
 }
 
 
@@ -195,15 +198,18 @@ function drawScene() {
     gl.depthFunc(gl.LEQUAL);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-
+    // Draw all blank items
+    gl.uniform1i(ctx.uTextureModeOn, 0);
     cartesianObject.draw(gl, ctx);
     leftCube.draw(gl);
-    rightCube.draw(gl);
 
     let newModelMatrix = mat4.create();
     mat4.translate(newModelMatrix, newModelMatrix, [0.25, 0, 0]);
     mat4.scale(newModelMatrix, newModelMatrix, [0.20, 0.20, 0.20]);
     gl.uniformMatrix4fv(ctx.uModelMatrixId, false, newModelMatrix);
-
     solidSphere.draw(gl, ctx.aVertexPositionId, ctx.aVertexColorId, null, [1.0, 0.0, 0.0]);
+
+    // Draw all textured items
+    gl.uniform1i(ctx.uTextureModeOn, 1);
+    rightCube.draw(gl);
 }

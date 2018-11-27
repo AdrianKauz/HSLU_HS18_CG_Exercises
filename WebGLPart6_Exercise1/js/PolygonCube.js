@@ -6,6 +6,7 @@ export function PolygonCube(gl) {
         aVertexColorId : -1,
         aTextureCoordId : -1,
         uModelMatrixId : -1,
+        uSampler : -1,
         texture : null,
         buffer : {
             vertices : -1,
@@ -17,7 +18,7 @@ export function PolygonCube(gl) {
         scaling : [1.0, 1.0, 1.0],
         position : [0.0, 0.0, 0.0],
         rotation : [0.0, 0.0, 0.0]
-    }
+    };
 
     let drawTexture = false;
 
@@ -141,6 +142,11 @@ export function PolygonCube(gl) {
     };
 
 
+    this.setSampler = function(newSampler) {
+        ctx.uSampler = newSampler;
+    }
+
+
     this.setTexture = function(newTexture) {
         ctx.texture = newTexture;
     };
@@ -198,13 +204,13 @@ export function PolygonCube(gl) {
 
         if(drawTexture) {
             // Texture
+            gl.uniform1i(ctx.uSampler, 0);
             gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.textCoords);
             gl.enableVertexAttribArray(ctx.aTextureCoordId);
             gl.vertexAttribPointer(ctx.aTextureCoordId, 2, gl.FLOAT, false, 0, 0);
 
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, ctx.texture);
-            gl.uniform1i(ctx.uSampler, 0);
 
             gl.vertexAttrib4fv(ctx.aVertexColorId, rgbaToV4(0, 0, 0, 0.0));
         }

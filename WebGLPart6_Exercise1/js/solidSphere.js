@@ -83,6 +83,8 @@ export function SolidSphere(gl, latitudeBands, longitudeBands) {
         gl.disableVertexAttribArray(aVertexColorId);
         gl.vertexAttrib4f(aVertexColorId, color[0], color[1], color[2], 1.0);
 
+
+
         // normal
 /*        gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferNormals);
         gl.vertexAttribPointer(aVertexNormalId, 3, gl.FLOAT, false, 0, 0);
