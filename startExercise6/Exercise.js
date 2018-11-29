@@ -46,7 +46,7 @@ var scene = {
     nearPlane: 0.1,
     farPlane: 30.0,
     fov: 40,
-    lightPosition: [2, 1.6, 1.0],
+    lightPosition: [0.5, 0.0, 0.75],
     lightColor: [1.0, 1.0, 1.0],
     rotateObjects: true,
     angle: 0,

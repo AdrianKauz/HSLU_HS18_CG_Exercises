@@ -150,7 +150,6 @@ function SolidCube(gl, backColor, frontColor, rightColor, leftColor, topColor, b
             // bind the element array
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufferSides);
             gl.drawElements(gl.TRIANGLES, 36 ,gl.UNSIGNED_SHORT, 0);
-
         }
     }
 }
