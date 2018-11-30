@@ -10,7 +10,7 @@ varying highp vec2 vTextureCoord;
 varying lowp vec4 vColor;
 
 void main() {
-    gl_Position = uProjectionMatrix * uCameraViewMatrix * uModelMatrix * aVertexPosition;
+    gl_Position = uProjectionMatrix * uCameraViewMatrix * uModelMatrix * aVertexPosition; // Projektion <- Camera <- Welt <- Model
     vTextureCoord = aTextureCoord;
     vColor = aVertexColor;
 }

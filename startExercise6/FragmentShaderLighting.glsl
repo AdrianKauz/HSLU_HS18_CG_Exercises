@@ -14,8 +14,8 @@ varying vec2 vTextureCoord;
 uniform sampler2D uSampler;
 
 const float ambientFactor = 0.10;
-const float shininess = 20.0;
-const vec3 specularMaterialColor = vec3(1.0, 1.0, 1.0);
+const float shininess = 2.0;
+const vec3 specularMaterialColor = vec3(0.4, 0.4, 0.4);
 
 void main() {
     vec3 baseColor = vColor;
@@ -31,7 +31,7 @@ void main() {
         vec3 ambientColor = ambientFactor * baseColor.rgb;
 
         // calculate light direction as seen from the vertex position
-        vec3 lightDirectionEye = uLightPosition;
+        vec3 lightDirectionEye = normalize(uLightPosition - vVertexPositionEye3);
         vec3 normal = normalize(vNormalEye);
 
         // diffuse lighting
@@ -49,7 +49,7 @@ void main() {
 
            float specularFactor = pow(cosPhi, shininess);
 
-           specularColor = specularMaterialColor * specularFactor * vec3(0.1, 0.1, 0.1);
+           specularColor = specularMaterialColor * specularFactor * uLightColor/* vec3(0.1, 0.1, 0.1)*/;
         }
 
         vec3 color = ambientColor + diffuseColor + specularColor;
