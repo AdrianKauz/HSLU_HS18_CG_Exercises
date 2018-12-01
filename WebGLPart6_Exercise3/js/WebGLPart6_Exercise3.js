@@ -4,6 +4,7 @@ import { rgbToV4, multiplyMat4V3 } from '../../js/HelperFunctions.js';
 import { KeyPressManager } from '../../js/KeyPressManager.js';
 import { CameraViewMatrix } from './CameraViewMatrix.js';
 import { SolidSphere } from './SolidSphere.js';
+import { LightObject } from './LightObject.js';
 
 // Register function to call after document has loaded
 window.onload = startup;
@@ -14,6 +15,7 @@ let leftCube = null;
 let solidSphere = null;
 let rightCube = null;
 let cartesianObject = null;
+let lightObject = null;
 
 let canvasHeight = 0;
 let canvasWidth = 0;
@@ -94,16 +96,27 @@ function startup() {
     rightCube.moveTo(0.0, 0.5, 0.0);
     rightCube.setRotation(Math.PI/4, 0, 0);
 
+    //
+    lightObject = new LightObject(gl);
+    lightObject.setVertexPositionId(ctx.attributes.aVertexPositionId);
+    lightObject.setModelViewMatrixId(ctx.uniforms.uModelViewMatrixId);
+    lightObject.setVertexColorId(ctx.attributes.aVertexColorId);
+    lightObject.setLightColorId(ctx.uniforms.uLightColorId);
+    lightObject.setLightPositionId(ctx.uniforms.uLightPositionId);
 
+    // CameraMatrix
     cameraViewMatrix.setPosition(Math.PI/2, Math.PI/2, Math.PI/8);
     cameraViewMatrix.setUpDirection(0.0, 0.0, 1.0);
     cameraViewMatrix.setLookAtPosition(0.0, 0.0, 0.0);
     cameraViewMatrix.setDistance(2.0);
 
+    // ProjektionMatrix
     setUpProjectionMatrix();
 
+    // Key-Listener
     keyPressManager.beginListening('ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '-');
 
+    // Start Animation-Loop
     animationLoop();
 }
 
@@ -218,15 +231,11 @@ function drawScene() {
 
     //console.log(multiplyMat4V3(cameraMatrix, [10.0, 20.0, 20.0]));
 
-    //gl.uniform3fv(ctx.uniforms.uLightPositionId, multiplyMat4V3(cameraMatrix, [20.0, 20.0, 20.0]));
-    gl.uniform3fv(ctx.uniforms.uLightPositionId, [20.0, 20.0, 20.0]);
-    gl.uniform3fv(ctx.uniforms.uLightColorId, [1.0, 1.0, 1.0]);
-
-
     // Draw all blank items
     disableTextureMode();
     disableLighting();
     cartesianObject.draw(gl, cameraMatrix);
+    lightObject.draw(gl, cameraMatrix);
     enableLighting();
     leftCube.draw(gl, cameraMatrix);
 

@@ -1,3 +1,7 @@
+export function rgbToV3(redValue, greenValue, blueValue) {
+    return [redValue / 255, greenValue / 255, blueValue / 255];
+}
+
 export function rgbToV4(redValue, greenValue, blueValue) {
     return [redValue / 255, greenValue / 255, blueValue / 255, 1.0];
 }
@@ -31,6 +35,7 @@ export function defineNewBuffer(gl, newArrayType, newDataArray, newUsageType) {
     const newBuffer = gl.createBuffer();
     gl.bindBuffer(newArrayType, newBuffer);
     gl.bufferData(newArrayType, newDataArray, newUsageType);
+    gl.bindBuffer(newArrayType, null);
 
     return newBuffer;
 }

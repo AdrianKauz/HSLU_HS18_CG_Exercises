@@ -27,4 +27,5 @@ void main() {
     vColor = aVertexColor;
 
     gl_Position = uProjectionMatrix * vVertexPositionEye4;
+    gl_PointSize = 10.0;
 }
