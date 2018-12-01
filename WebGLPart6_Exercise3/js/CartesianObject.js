@@ -12,10 +12,9 @@ export function CartesianObject() {
             aVertexPositionId : -1
         },
         uniforms : {
-            uModelMatrixId : -1
+            uModelViewMatrixId : -1
         },
-
-        modelMatrix : null,
+        modelMatrix : mat4.create()
     };
 
     const buffer = {
@@ -33,8 +32,8 @@ export function CartesianObject() {
         this.ticks = newNumberOfTicks;
     };
 
-    this.setModelMatrixId = function(newModelMatrixId) {
-        ctx.uniforms.uModelMatrixId = newModelMatrixId;
+    this.setModelViewMatrixId = function(newModelViewMatrixId) {
+        ctx.uniforms.uModelViewMatrixId = newModelViewMatrixId;
     };
 
 
@@ -56,10 +55,9 @@ export function CartesianObject() {
     };
 
 
-    this.draw = function(gl) {
+    this.draw = function(gl, newCameraMatrix) {
         // Set ModelMatrix
-        refreshModelMatrix();
-        gl.uniformMatrix4fv(ctx.uniforms.uModelMatrixId, false, ctx.modelMatrix);
+        gl.uniformMatrix4fv(ctx.uniforms.uModelViewMatrixId, false, newCameraMatrix);
 
         // Define color
         gl.vertexAttrib4fv(ctx.attributes.aVertexColorId, color);
@@ -108,10 +106,5 @@ export function CartesianObject() {
         }
 
         return indices;
-    }
-
-
-    function refreshModelMatrix() {
-        ctx.modelMatrix = mat4.create();
     }
 }

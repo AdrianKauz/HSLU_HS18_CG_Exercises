@@ -6,7 +6,7 @@ export function PolygonCube(gl) {
         aVertexColorId : -1,
         aTextureCoordId : -1,
         aVertexNormalId : -1,
-        uModelMatrixId : -1,
+        uModelViewMatrixId : -1,
         uNormalMatrixId : 1,
         uSampler : -1,
         texture : null,
@@ -17,7 +17,7 @@ export function PolygonCube(gl) {
             textCoords : -1,
             normals : -1
         },
-        modelMatrix : null,
+        modelViewMatrix : null,
         scaling : [1.0, 1.0, 1.0],
         position : [0.0, 0.0, 0.0],
         rotation : [0.0, 0.0, 0.0]
@@ -107,17 +107,17 @@ export function PolygonCube(gl) {
         rgbToV4(255,  80,  14), // Back Side
         rgbToV4(255,  20,  20), // Top Side
         rgbToV4(255,  20,  20), // Bottom Side
-        rgbToV4(255, 153,  15), // Right Side
-        rgbToV4(255, 153,  15)  // Left Side
+        rgbToV4(230, 153,  15), // Right Side
+        rgbToV4(230, 153,  15)  // Left Side
     ];
 
     const normals = [
-         0.0,  0.0,  1.0, // Front Side Normal
-         0.0,  0.0, -1.0, // Back Side Normal
-         0.0,  1.0,  0.0, // Top Side Normal
-         0.0, -1.0,  0.0, // Bottom Side Normal
-         1.0,  0.0,  0.0, // Right Side Normal
-        -1.0,  0.0,  0.0  // Left Side Normal
+        [ 0.0,  0.0,  1.0], // Front Side Normal
+        [ 0.0,  0.0, -1.0], // Back Side Normal
+        [ 0.0,  1.0,  0.0], // Top Side Normal
+        [ 0.0, -1.0,  0.0], // Bottom Side Normal
+        [ 1.0,  0.0,  0.0], // Right Side Normal
+        [-1.0,  0.0,  0.0]  // Left Side Normal
     ];
 
     const indices = [
@@ -153,8 +153,8 @@ export function PolygonCube(gl) {
     };
 
 
-    this.setModelMatrixId = function(newModelMatrixId) {
-        ctx.uModelMatrixId = newModelMatrixId;
+    this.setModelViewMatrixId = function(newModelViewMatrixId) {
+        ctx.uModelViewMatrixId = newModelViewMatrixId;
     };
 
 
@@ -218,10 +218,15 @@ export function PolygonCube(gl) {
     };
 
 
-    this.draw = function(gl) {
+    this.draw = function(gl, newCameraMatrix) {
         // Set ModelMatrix
-        refreshModelMatrix();
-        gl.uniformMatrix4fv(ctx.uModelMatrixId, false, ctx.modelMatrix);
+        refreshModelViewMatrix(newCameraMatrix);
+        gl.uniformMatrix4fv(ctx.uModelViewMatrixId, false, ctx.modelViewMatrix);
+
+        // Generate Normal Matrix
+        let normalMatrix = mat3.create();
+        mat3.normalFromMat4(normalMatrix, ctx.modelViewMatrix);
+        gl.uniformMatrix3fv(ctx.uNormalMatrixId, false, normalMatrix);
 
         // Vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.vertices);
@@ -268,25 +273,25 @@ export function PolygonCube(gl) {
     };
 
 
-    function refreshModelMatrix() {
-        ctx.modelMatrix = mat4.create();
+    function refreshModelViewMatrix(newCameraMatrix) {
+        ctx.modelViewMatrix = mat4.create();
 
-        mat4.translate(ctx.modelMatrix,ctx.modelMatrix, ctx.position);
+        mat4.translate(ctx.modelViewMatrix, newCameraMatrix, ctx.position);
 
         if((ctx.rotation[0] !== 1.0) && (ctx.rotation[1] !== 1.0) && (ctx.rotation[2] !== 1.0)) {
-            mat4.scale(ctx.modelMatrix,ctx.modelMatrix, ctx.scaling);
+            mat4.scale(ctx.modelViewMatrix, ctx.modelViewMatrix, ctx.scaling);
         }
 
         if(ctx.rotation[0] !== 0.0) {
-            mat4.rotateX(ctx.modelMatrix,ctx.modelMatrix, ctx.rotation[0]);
+            mat4.rotateX(ctx.modelViewMatrix, ctx.modelViewMatrix, ctx.rotation[0]);
         }
 
         if(ctx.rotation[1] !== 0.0) {
-            mat4.rotateY(ctx.modelMatrix,ctx.modelMatrix, ctx.rotation[1]);
+            mat4.rotateY(ctx.modelViewMatrix, ctx.modelViewMatrix, ctx.rotation[1]);
         }
 
         if(ctx.rotation[2] !== 0.0) {
-            mat4.rotateZ(ctx.modelMatrix,ctx.modelMatrix, ctx.rotation[2]);
+            mat4.rotateZ(ctx.modelViewMatrix, ctx.modelViewMatrix, ctx.rotation[2]);
         }
     }
 }

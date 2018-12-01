@@ -14,7 +14,7 @@ varying vec2 vTextureCoord;
 uniform sampler2D uSampler;
 
 const float ambientFactor = 0.10;
-const float shininess = 2.0;
+const float shininess = 10.0;
 const vec3 specularMaterialColor = vec3(0.4, 0.4, 0.4);
 
 void main() {
@@ -49,7 +49,7 @@ void main() {
 
            float specularFactor = pow(cosPhi, shininess);
 
-           specularColor = specularMaterialColor * specularFactor * uLightColor/* vec3(0.1, 0.1, 0.1)*/;
+           specularColor = specularMaterialColor * specularFactor * uLightColor;
         }
 
         vec3 color = ambientColor + diffuseColor + specularColor;

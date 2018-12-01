@@ -46,7 +46,7 @@ var scene = {
     nearPlane: 0.1,
     farPlane: 30.0,
     fov: 40,
-    lightPosition: [0.0, 10.0, 0.0],
+    lightPosition: [10.0, 20.0, -20.0],
     lightColor: [1.0, 1.0, 1.0],
     rotateObjects: true,
     angle: 0,
@@ -170,6 +170,8 @@ function draw() {
 
     // set the matrices from the scene
     mat4.lookAt(viewMatrix, scene.eyePosition, scene.lookAtPosition, scene.upVector);
+    //console.log(viewMatrix);
+
 
     mat4.perspective(projectionMatrix,
         glMatrix.toRadian(40),

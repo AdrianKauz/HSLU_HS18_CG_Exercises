@@ -1,6 +1,6 @@
 export function CameraViewMatrix() {
     let currentMatrix = null;
-    let distance = 1.3;
+    let distance = 1.0;
     let currentPosition = [1.00, 1.00, 0.60];
     let lookAtPosition = [0.0, 0.0, 0.0];
     let up = [0.0, 0.0, 1.0];
@@ -8,9 +8,9 @@ export function CameraViewMatrix() {
     const stepSizeRotation = 0.01;
 
 
-    this.updateShader = function(gl, matrixLocation) {
-        gl.uniformMatrix4fv(matrixLocation, false, currentMatrix);
-    };
+    this.getMatrix = function() {
+        return currentMatrix;
+    }
 
 
     this.setUpDirection = function(newXDirection, newYDirection, newZDirection) {
