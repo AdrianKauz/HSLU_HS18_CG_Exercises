@@ -10,6 +10,7 @@ uniform bool uEnableLighting;
 uniform sampler2D uSampler;
 uniform vec3 uLightPosition;
 uniform vec3 uLightColor;
+uniform vec3 uViewPosition;
 
 const float ambientFactor = 0.1;
 const float shininess = 50.0;
@@ -25,6 +26,12 @@ void main() {
         // calculate light direction as seen from the vertex position
         vec3 surfaceToLightDirection = normalize(uLightPosition - vVertexPositionEye);
 
+        // calculate light direction as seen from the viewer position
+        vec3 surfaceToViewDirection = normalize(uViewPosition - vVertexPositionEye);
+
+        //vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
+
+
         vec3 normal = normalize(vNormalEye);
 
         // diffuse lighting
@@ -34,9 +41,9 @@ void main() {
         // specular lighting
         vec3 specularColor = vec3(0, 0, 0);
         if (diffuseFactor > 0.0) {
-           vec3 reflectionDir = reflect(surfaceToLightDirection, normal);
+           vec3 reflectionDir = reflect(-surfaceToLightDirection, normal);
            vec3 eyeDir = normalize(vVertexPositionEye);
-           float cosPhi = max(dot(reflectionDir, eyeDir), 0.0);
+           float cosPhi = max(dot(reflectionDir, surfaceToViewDirection), 0.0);
            float specularFactor = pow(cosPhi, shininess);
 
            specularColor = specularMaterialColor * specularFactor * uLightColor;
