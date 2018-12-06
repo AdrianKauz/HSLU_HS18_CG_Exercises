@@ -1,4 +1,4 @@
-import {defineNewBuffer, rgbToV3, rgbToV4, multiplyMat4V3} from "../../js/HelperFunctions.js";
+import { defineNewBuffer, rgbToV3, rgbToV4 } from "../../js/HelperFunctions.js";
 
 export function LightObject(gl) {
     const ctx = {
@@ -17,7 +17,7 @@ export function LightObject(gl) {
         modelViewMatrix : null,
         position : [20.0, -2.0, 0.0],
         color : [255, 255, 255]
-    }
+    };
 
     const vertices = [0.0, 0.0, 0.0];
 
@@ -50,15 +50,26 @@ export function LightObject(gl) {
     };
 
 
+    this.setPosition = function(newPosX, newPosY, newPosZ) {
+      ctx.position = [newPosX, newPosY, newPosZ];
+    };
+
+
+    this.setColor = function(newRed, newGreen, newBlue) {
+        ctx.color = [newRed, newGreen, newBlue];
+    };
+
+
+    this.init = function(gl) {
+        gl.uniform3fv(ctx.uniforms.uLightPositionId, ctx.position);
+        gl.uniform3fv(ctx.uniforms.uLightColorId, rgbToV3(ctx.color[0], ctx.color[1], ctx.color[2]));
+    };
+
+
     this.draw = function(gl, newCameraMatrix) {
         // Set ModelMatrix
         refreshModelViewMatrix(newCameraMatrix);
         gl.uniformMatrix4fv(ctx.uniforms.uModelViewMatrixId, false, ctx.modelViewMatrix);
-
-        // Light
-        //gl.uniform3fv(ctx.uniforms.uLightPositionId, multiplyMat4V3(ctx.modelViewMatrix, ctx.position) );
-        gl.uniform3fv(ctx.uniforms.uLightPositionId, ctx.position);
-        gl.uniform3fv(ctx.uniforms.uLightColorId, rgbToV3(ctx.color[0], ctx.color[1], ctx.color[2]));
 
         // Color
         gl.vertexAttrib4fv(ctx.attributes.aVertexColorId, rgbToV4(ctx.color[0], ctx.color[1], ctx.color[2]));
@@ -72,7 +83,7 @@ export function LightObject(gl) {
 
         // Disable
         gl.disableVertexAttribArray(ctx.attributes.aVertexPositionId);
-    }
+    };
 
 
     function refreshModelViewMatrix(newCameraMatrix) {
@@ -80,8 +91,3 @@ export function LightObject(gl) {
         mat4.translate(ctx.modelViewMatrix, newCameraMatrix, ctx.position);
     }
 }
-
-
-//gl.uniform3fv(ctx.uniforms.uLightPositionId, multiplyMat4V3(cameraMatrix, [20.0, 20.0, 20.0]));
-//gl.uniform3fv(ctx.uniforms.uLightPositionId, [20.0, 20.0, 20.0]);
-//gl.uniform3fv(ctx.uniforms.uLightColorId, [1.0, 1.0, 1.0]);

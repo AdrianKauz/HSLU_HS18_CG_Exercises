@@ -1,6 +1,6 @@
 import { PolygonCube } from './PolygonCube.js';
 import { CartesianObject } from './CartesianObject.js';
-import { rgbToV4, multiplyMat4V3 } from '../../js/HelperFunctions.js';
+import { rgbToV4 } from '../../js/HelperFunctions.js';
 import { KeyPressManager } from '../../js/KeyPressManager.js';
 import { CameraViewMatrix } from './CameraViewMatrix.js';
 import { SolidSphere } from './SolidSphere.js';
@@ -11,9 +11,11 @@ window.onload = startup;
 
 // Globals
 let gl = null;
-let leftCube = null;
-let solidSphere = null;
-let rightCube = null;
+let blankCube = null;
+let bigSolidSphere = null;
+let mediumSolidSphere = null;
+let smallSolidSphere = null;
+let texturedCube = null;
 let cartesianObject = null;
 let lightObject = null;
 
@@ -67,45 +69,75 @@ function startup() {
     cartesianObject.setTicks(80);
     cartesianObject.init(gl);
 
-    // Left Cube
-    leftCube = new PolygonCube(gl);
-    leftCube.setVertexColorId(ctx.attributes.aVertexColorId);
-    leftCube.setVertexPositionId(ctx.attributes.aVertexPositionId);
-    leftCube.setVertexNormal(ctx.attributes.aVertexNormalId);
-    leftCube.setModelViewMatrixId(ctx.uniforms.uModelViewMatrixId);
-    leftCube.setNormalMatrix(ctx.uniforms.uNormalMatrixId);
-    leftCube.setScaling(0.25, 0.25, 0.25);
-    leftCube.moveTo(0.0, -0.5, 0.0);
-    leftCube.setRotation(Math.PI/4, 0, 0);
+    // Cubes
+    blankCube = new PolygonCube(gl);
+    blankCube.setVertexColorId(ctx.attributes.aVertexColorId);
+    blankCube.setVertexPositionId(ctx.attributes.aVertexPositionId);
+    blankCube.setVertexNormal(ctx.attributes.aVertexNormalId);
+    blankCube.setModelViewMatrixId(ctx.uniforms.uModelViewMatrixId);
+    blankCube.setNormalMatrix(ctx.uniforms.uNormalMatrixId);
+    blankCube.setScaling(0.25, 0.25, 0.25);
+    blankCube.moveTo(0.0, 0.5, 0.0);
+    blankCube.setRotation(Math.PI / 4, 0, 0);
 
-    // Solid Sphere
-    solidSphere = new SolidSphere(gl, 40, 40);
+    texturedCube = new PolygonCube(gl);
+    texturedCube.setTextureCoordId(ctx.attributes.aTextureCoordId);
+    texturedCube.setVertexColorId(ctx.attributes.aVertexColorId);
+    texturedCube.setVertexPositionId(ctx.attributes.aVertexPositionId);
+    texturedCube.setVertexNormal(ctx.attributes.aVertexNormalId);
+    texturedCube.setModelViewMatrixId(ctx.uniforms.uModelViewMatrixId);
+    texturedCube.setNormalMatrix(ctx.uniforms.uNormalMatrixId);
+    texturedCube.setSampler(ctx.uniforms.uSamplerId);
+    texturedCube.setTexture(texBuffer[0]);
+    texturedCube.enableTexture();
+    texturedCube.setScaling(0.35, 0.35, 0.35);
+    texturedCube.moveTo(0.0, -0.5, 0.0);
+    texturedCube.setRotation(Math.PI / 4, 0, 0);
 
-    // Right Cube
-    rightCube = new PolygonCube(gl);
-    rightCube.setTextureCoordId(ctx.attributes.aTextureCoordId);
-    rightCube.setVertexColorId(ctx.attributes.aVertexColorId);
-    rightCube.setVertexPositionId(ctx.attributes.aVertexPositionId);
-    rightCube.setVertexNormal(ctx.attributes.aVertexNormalId);
-    rightCube.setModelViewMatrixId(ctx.uniforms.uModelViewMatrixId);
-    rightCube.setNormalMatrix(ctx.uniforms.uNormalMatrixId);
-    rightCube.setSampler(ctx.uniforms.uSamplerId);
-    rightCube.setTexture(texBuffer[0]);
-    rightCube.enableTexture();
-    rightCube.setScaling(0.25, 0.25, 0.25);
-    rightCube.moveTo(0.0, 0.5, 0.0);
-    rightCube.setRotation(Math.PI/4, 0, 0);
+    // Solid Spheres
+    bigSolidSphere = new SolidSphere(gl, 40, 40);
+    bigSolidSphere.setVertexPositionId(ctx.attributes.aVertexPositionId);
+    bigSolidSphere.setVertexColorId(ctx.attributes.aVertexColorId);
+    bigSolidSphere.setVertexNormal(ctx.attributes.aVertexNormalId);
+    bigSolidSphere.setModelViewMatrixId(ctx.uniforms.uModelViewMatrixId);
+    bigSolidSphere.setNormalMatrix(ctx.uniforms.uNormalMatrixId);
+    bigSolidSphere.setPosition(-0.7, 0.0, 0.0);
+    bigSolidSphere.setScaling(0.3, 0.3, 0.3);
+    bigSolidSphere.setColor(255, 0, 0);
 
-    //
+    mediumSolidSphere = new SolidSphere(gl, 40, 40);
+    mediumSolidSphere.setVertexPositionId(ctx.attributes.aVertexPositionId);
+    mediumSolidSphere.setVertexColorId(ctx.attributes.aVertexColorId);
+    mediumSolidSphere.setVertexNormal(ctx.attributes.aVertexNormalId);
+    mediumSolidSphere.setModelViewMatrixId(ctx.uniforms.uModelViewMatrixId);
+    mediumSolidSphere.setNormalMatrix(ctx.uniforms.uNormalMatrixId);
+    mediumSolidSphere.setPosition(0.0, 0.0, 0.0);
+    mediumSolidSphere.setScaling(0.2, 0.2, 0.2);
+    mediumSolidSphere.setColor(0, 255, 0);
+
+    smallSolidSphere = new SolidSphere(gl, 40, 40);
+    smallSolidSphere.setVertexPositionId(ctx.attributes.aVertexPositionId);
+    smallSolidSphere.setVertexColorId(ctx.attributes.aVertexColorId);
+    smallSolidSphere.setVertexNormal(ctx.attributes.aVertexNormalId);
+    smallSolidSphere.setModelViewMatrixId(ctx.uniforms.uModelViewMatrixId);
+    smallSolidSphere.setNormalMatrix(ctx.uniforms.uNormalMatrixId);
+    smallSolidSphere.setPosition(0.5, 0.0, 0.0);
+    smallSolidSphere.setScaling(0.1, 0.1, 0.1);
+    smallSolidSphere.setColor(0, 0, 255);
+
+    // Light Object
     lightObject = new LightObject(gl);
     lightObject.setVertexPositionId(ctx.attributes.aVertexPositionId);
     lightObject.setModelViewMatrixId(ctx.uniforms.uModelViewMatrixId);
     lightObject.setVertexColorId(ctx.attributes.aVertexColorId);
     lightObject.setLightColorId(ctx.uniforms.uLightColorId);
     lightObject.setLightPositionId(ctx.uniforms.uLightPositionId);
+    lightObject.setPosition(10.0, 20.0, 15.0);
+    lightObject.setColor(255, 255, 255);
+    lightObject.init(gl);
 
     // CameraMatrix
-    cameraViewMatrix.setPosition(Math.PI/2, Math.PI/2, Math.PI/8);
+    cameraViewMatrix.setPosition(Math.PI / 3, Math.PI / 3, Math.PI / 5);
     cameraViewMatrix.setUpDirection(0.0, 0.0, 1.0);
     cameraViewMatrix.setLookAtPosition(0.0, 0.0, 0.0);
     cameraViewMatrix.setDistance(2.0);
@@ -211,10 +243,10 @@ function refreshScene() {
     if(keyPressManager.isPressed('+')) { cameraViewMatrix.zoomIn(); }
     if(keyPressManager.isPressed('-')) { cameraViewMatrix.zoomOut(); }
 
-    leftCube.addRotationX(-0.01);
-    leftCube.addRotationY(-0.005);
-    rightCube.addRotationX(-0.008);
-    rightCube.addRotationY(-0.005);
+    blankCube.addRotationX(-0.01);
+    blankCube.addRotationY(-0.005);
+    texturedCube.addRotationX(0.008);
+    texturedCube.addRotationY(0.005);
 }
 
 
@@ -229,30 +261,20 @@ function drawScene() {
 
     let cameraMatrix = cameraViewMatrix.getMatrix();
 
-    //console.log(multiplyMat4V3(cameraMatrix, [10.0, 20.0, 20.0]));
-
     // Draw all blank items
     disableTextureMode();
     disableLighting();
     cartesianObject.draw(gl, cameraMatrix);
-    lightObject.draw(gl, cameraMatrix);
     enableLighting();
-    leftCube.draw(gl, cameraMatrix);
-
-    let newModelMatrix = mat4.create();
-    mat4.translate(newModelMatrix, cameraMatrix, [0.0, 0.0, 0.0]);
-    mat4.scale(newModelMatrix, newModelMatrix, [0.20, 0.20, 0.20]);
-    gl.uniformMatrix4fv(ctx.uniforms.uModelViewMatrixId, false, newModelMatrix);
-    let normalMatrix = mat3.create();
-    mat3.normalFromMat4(normalMatrix, newModelMatrix);
-    gl.uniformMatrix3fv(ctx.uniforms.uNormalMatrixId, false, normalMatrix);
-    solidSphere.draw(gl, ctx.attributes.aVertexPositionId, ctx.attributes.aVertexColorId, ctx.attributes.aVertexNormalId, [1.0, 0.0, 0.0]);
+    blankCube.draw(gl, cameraMatrix);
+    bigSolidSphere.draw(gl, cameraMatrix);
+    smallSolidSphere.draw(gl, cameraMatrix);
+    mediumSolidSphere.draw(gl, cameraMatrix);
 
     // Draw all textured items
     enableTextureMode();
-    rightCube.draw(gl, cameraMatrix);
+    texturedCube.draw(gl, cameraMatrix);
 }
-
 
 
 function enableTextureMode() {

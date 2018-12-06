@@ -1,6 +1,6 @@
 import { PolygonCube } from './PolygonCube.js';
 import { CartesianObject } from './CartesianObject.js';
-import { rgbToV4, multiplyMat4V3 } from '../../js/HelperFunctions.js';
+import { rgbToV4 } from '../../js/HelperFunctions.js';
 import { KeyPressManager } from '../../js/KeyPressManager.js';
 import { CameraViewMatrix } from './CameraViewMatrix.js';
 import { SolidSphere } from './SolidSphere.js';
