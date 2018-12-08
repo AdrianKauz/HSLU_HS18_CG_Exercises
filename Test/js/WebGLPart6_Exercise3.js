@@ -5,6 +5,7 @@ import { KeyPressManager } from '../../js/KeyPressManager.js';
 import { CameraViewMatrix } from './CameraViewMatrix.js';
 import { SolidSphere } from './SolidSphere.js';
 import { LightObject } from './LightObject.js';
+import { OrbitalObject } from './OrbitalObject.js';
 
 // Register function to call after document has loaded
 window.onload = startup;
@@ -18,6 +19,8 @@ let smallSolidSphere = null;
 let texturedCube = null;
 let cartesianObject = null;
 let lightObject = null;
+let orbitalObject = null;
+
 
 let canvasHeight = 0;
 let canvasWidth = 0;
@@ -47,12 +50,12 @@ const ctx = {
     objects : {
         deepSpaceSphere : null,
         sun : null
-    }
-
+    },
+    timeStamp : null,
+    textures : new Map()
 };
 
 let texBuffer = [1];
-
 
 /**
  * Startup function to be called when the body is loaded
@@ -67,9 +70,12 @@ function startup() {
     gl = createGLContext(canvas);
     initGL();
 
+    ctx.textures.set("sun", loadTexture(gl, "./img/sun.jpg"));
+
     texBuffer[0] = loadTexture(gl, "./img/lena_512x512.png");
-    texBuffer[1] = loadTexture(gl, "./img/space.png");
+    texBuffer[1] = loadTexture(gl, "./img/space_8k.png");
     texBuffer[2] = loadTexture(gl, "./img/sun.jpg");
+    texBuffer[3] = loadTexture(gl, "./img/2k_planet_neptune.jpg");
 
     // Cartesian axis
     cartesianObject = new CartesianObject();
@@ -112,8 +118,9 @@ function startup() {
     ctx.objects.deepSpaceSphere.setPosition(0.0, 0.0, 0.0);
     ctx.objects.deepSpaceSphere.setScaling(30.0, 30.0, 30.0);
     ctx.objects.deepSpaceSphere.setColor(255, 0, 0);
+    ctx.objects.deepSpaceSphere.setRotation(Math.PI/2.7,0,0);
 
-    ctx.objects.sun = new SolidSphere(gl, 40, 40);
+    ctx.objects.sun = new SolidSphere(gl, 80, 80);
     ctx.objects.sun.setShaderAttributes(ctx.attributes);
     ctx.objects.sun.setShaderUniforms(ctx.uniforms);
     ctx.objects.sun.setTexture(texBuffer[2]);
@@ -124,23 +131,44 @@ function startup() {
     smallSolidSphere = new SolidSphere(gl, 40, 40);
     smallSolidSphere.setShaderAttributes(ctx.attributes);
     smallSolidSphere.setShaderUniforms(ctx.uniforms);
+    smallSolidSphere.setTexture(texBuffer[3]);
     smallSolidSphere.setPosition(-3.0, 0.0, 0.0);
-    smallSolidSphere.setScaling(0.1, 0.1, 0.1);
-    smallSolidSphere.setColor(0, 0, 255);
+    smallSolidSphere.setScaling(0.3, 0.3, 0.3);
+    smallSolidSphere.setColor(255, 255, 255);
+    smallSolidSphere.setRotation(Math.PI/2,0,0);
 
     // Light Object
     lightObject = new LightObject(gl);
     lightObject.setShaderAttributes(ctx.attributes);
     lightObject.setShaderUniforms(ctx.uniforms);
-    lightObject.setPosition(-20.0, 0.0, 20.0);
-    lightObject.setColor(255, 255, 255);
+    lightObject.setPosition(0.0, 0.0, 0.0);
+    lightObject.setColor(255, 255, 200);
     lightObject.init(gl);
 
     // CameraMatrix
     cameraViewMatrix.setPosition(Math.PI / 3, Math.PI / 3, Math.PI / 5);
     cameraViewMatrix.setUpDirection(0.0, 0.0, 1.0);
     cameraViewMatrix.setLookAtPosition(0.0, 0.0, 0.0);
-    cameraViewMatrix.setDistance(10.0);
+    cameraViewMatrix.setDistance(2.0);
+
+
+    // Orbital TestObject
+    let currModel = new SolidSphere(gl, 40, 40);
+    currModel.setShaderAttributes(ctx.attributes);
+    currModel.setShaderUniforms(ctx.uniforms);
+    currModel.setScaling(0.2, 0.2, 0.2);
+    currModel.setTexture(ctx.textures.get("sun"));
+    currModel.setPosition(0.0, 0.0, 0.0);
+    currModel.setRotation(Math.PI,0,0);
+
+    orbitalObject = new OrbitalObject();
+    orbitalObject.setModel(currModel);
+    orbitalObject.setPosition(0.0, 0.0, 0.0);
+
+
+
+
+
 
     // ProjektionMatrix
     setUpProjectionMatrix();
@@ -160,7 +188,7 @@ function initGL() {
     "use strict";
     ctx.shaderProgram = loadAndCompileShaders(gl, 'shaders/VertexShader.glsl', 'shaders/FragmentShader.glsl');
     setUpAttributesAndUniforms();
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    gl.clearColor(1.0, 0.0, 0.0, 1.0);
     gl.clearDepth(1.0);
 }
 
@@ -230,22 +258,30 @@ function loadTexture(gl, url) {
 }
 
 
-function animationLoop() {
-    refreshScene();
+function animationLoop(currTimeStamp) {
+    if(ctx.timeStamp == null) {
+        ctx.timeStamp = currTimeStamp;
+    }
+
+    refreshScene(currTimeStamp - ctx.timeStamp);
     drawScene();
 
+    ctx.timeStamp = currTimeStamp;
     window.requestAnimationFrame(animationLoop);
 }
 
 
-function refreshScene() {
+function refreshScene(deltaTime) {
     if(keyPressManager.isPressed('ArrowLeft')) { cameraViewMatrix.rotateLeft(); }
     if(keyPressManager.isPressed('ArrowRight')) { cameraViewMatrix.rotateRight(); }
     if(keyPressManager.isPressed('ArrowUp')) { cameraViewMatrix.rotateUp(); }
     if(keyPressManager.isPressed('ArrowDown')) { cameraViewMatrix.rotateDown(); }
     if(keyPressManager.isPressed('+')) { cameraViewMatrix.zoomIn(); }
     if(keyPressManager.isPressed('-')) { cameraViewMatrix.zoomOut(); }
-/*
+
+    orbitalObject.refreshModel(deltaTime);
+
+    /*
     blankCube.addRotationX(-0.01);
     blankCube.addRotationY(-0.005);
     texturedCube.addRotationX(0.008);
@@ -268,16 +304,22 @@ function drawScene() {
     disableTextureMode();
     disableLighting();
     cartesianObject.draw(gl, cameraMatrix);
+    lightObject.refreshLightPosition(gl, cameraMatrix);
+    lightObject.draw(gl);
     enableLighting();
-    smallSolidSphere.draw(gl, cameraMatrix);
+
 
 
 
     // Draw all textured items
     enableTextureMode();
+    //smallSolidSphere.draw(gl, cameraMatrix);
     disableLighting();
-    ctx.objects.sun.draw(gl, cameraMatrix);
+    //ctx.objects.sun.draw(gl, cameraMatrix);
+    orbitalObject.draw(gl, cameraMatrix);
+
     ctx.objects.deepSpaceSphere.draw(gl, cameraMatrix);
+
     //texturedCube.draw(gl, cameraMatrix);
 }
 

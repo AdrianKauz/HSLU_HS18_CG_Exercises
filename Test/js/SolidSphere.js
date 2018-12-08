@@ -47,6 +47,7 @@ export function SolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         textures : [],
         scaling : [1.0, 1.0, 1.0],
         position : [0.0, 0.0, 0.0],
+        rotation : [0.0, 0.0, 0.0],
         color : [255, 0, 0],
         texture : null
     };
@@ -94,14 +95,18 @@ export function SolidSphere(gl, newLatitudeBands, newLongitudeBands) {
     };
 
 
+    this.setRotation = function(newXRotation, newYRotation, newZRotation,) {
+        ctx.rotation = [newXRotation, newYRotation, newZRotation];
+    };
+
+
     this.setColor = function(newRed, newGreen, newBlue) {
         ctx.color = [newRed, newGreen, newBlue];
     };
 
 
-    this.setCoordDetails = function(newLatitude, newLongitude) {
-        ctx.latitudeBands = newLatitude;
-        ctx.longitudeBands = newLongitude;
+    this.setModelMatrix = function(newModelmatrix) {
+        ctx.matrices.model = newModelmatrix;
     };
 
 
@@ -109,10 +114,13 @@ export function SolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         "use strict";
         // Set Matrices
         ctx.matrices.view = newViewMatrix;
-        gl.uniformMatrix4fv(ctx.uniforms.uViewMatrixId, false, ctx.matrices.view);
 
         refreshModelMatrix();
         refreshNormalMatrix();
+
+        gl.uniformMatrix4fv(ctx.uniforms.uViewMatrixId, false, ctx.matrices.view);
+        gl.uniformMatrix4fv(ctx.uniforms.uModelMatrixId, false, ctx.matrices.model);
+        gl.uniformMatrix3fv(ctx.uniforms.uNormalMatrixId, false, ctx.matrices.normal);
 
         // position
         gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.vertices);
@@ -154,7 +162,7 @@ export function SolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         gl.disableVertexAttribArray(ctx.attributes.aVertexPositionId);
         gl.disableVertexAttribArray(ctx.attributes.aVertexNormalId);
         gl.disableVertexAttribArray(ctx.attributes.aVertexColorId);
-    }
+    };
 
 
     function defineVerticesAndTexture(latitudeBands, longitudeBands) {
@@ -228,9 +236,22 @@ export function SolidSphere(gl, newLatitudeBands, newLongitudeBands) {
     function refreshModelMatrix() {
         ctx.matrices.model = mat4.create();
         mat4.translate(ctx.matrices.model, ctx.matrices.model, ctx.position);
-        mat4.scale(ctx.matrices.model, ctx.matrices.model, ctx.scaling);
 
-        gl.uniformMatrix4fv(ctx.uniforms.uModelMatrixId, false, ctx.matrices.model);
+        if((ctx.scaling[0] !== 1.0) && (ctx.scaling[1] !== 1.0) && (ctx.scaling[2] !== 1.0)) {
+            mat4.scale(ctx.matrices.model, ctx.matrices.model, ctx.scaling);
+        }
+
+        if(ctx.rotation[0] !== 0.0) {
+            mat4.rotateX(ctx.matrices.model, ctx.matrices.model, ctx.rotation[0]);
+        }
+
+        if(ctx.rotation[1] !== 0.0) {
+            mat4.rotateY(ctx.matrices.model, ctx.matrices.model, ctx.rotation[1]);
+        }
+
+        if(ctx.rotation[2] !== 0.0) {
+            mat4.rotateZ(ctx.matrices.model, ctx.matrices.model, ctx.rotation[2]);
+        }
     }
 
 
@@ -240,7 +261,5 @@ export function SolidSphere(gl, newLatitudeBands, newLongitudeBands) {
 
         ctx.matrices.normal = mat3.create();
         mat3.normalFromMat4(ctx.matrices.normal, modelViewMatrix);
-
-        gl.uniformMatrix3fv(ctx.uniforms.uNormalMatrixId, false, ctx.matrices.normal);
     }
 }

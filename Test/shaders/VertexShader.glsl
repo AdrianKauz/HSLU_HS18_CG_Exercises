@@ -14,8 +14,6 @@ varying vec3 vVertexPositionEye;
 varying vec3 vNormal;
 
 void main() {
-    gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * aVertexPosition;
-
     // calculate the vertex position in eye Coordinate
     vec4 vVertexPositionMV = uViewMatrix * uModelMatrix * aVertexPosition;
     vVertexPositionEye = vVertexPositionMV.xyz / vVertexPositionMV.w;
@@ -29,5 +27,7 @@ void main() {
     // set color for fragment shaded
     vColor = aVertexColor;
 
-    gl_PointSize = 10.0;
+    // Set Pointsize for
+    gl_PointSize = 5.0;
+    gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * aVertexPosition;
 }

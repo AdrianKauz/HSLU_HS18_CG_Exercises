@@ -16,18 +16,15 @@ export function LightObject(gl) {
             vertices : -1
         },
         matrices : {
-            model : null,
+            model : mat4.create(),
             view : null
         },
-        modelViewMatrix : null,
-        position : [20.0, -2.0, 0.0],
+        position : [0.0, 0.0, 0.0],
         color : [255, 255, 255]
     };
 
-    const vertices = [0.0, 0.0, 0.0];
-
     // Set Buffer
-    ctx.buffer.vertices = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    ctx.buffer.vertices = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(ctx.position), gl.STATIC_DRAW);
 
 
     this.setShaderAttributes = function(newAttributes) {
@@ -65,12 +62,9 @@ export function LightObject(gl) {
     };
 
 
-    this.draw = function(gl, newViewMatrix) {
-        // Set Matrices
-        ctx.matrices.view = newViewMatrix;
-        gl.uniformMatrix4fv(ctx.uniforms.uViewMatrixId, false, ctx.matrices.view);
-
-        refreshModelMatrix();
+    this.draw = function(gl) {
+        // Set ModelMatrix
+        gl.uniformMatrix4fv(ctx.uniforms.uModelMatrixId, false, ctx.matrices.model);
 
         // Color
         gl.vertexAttrib4fv(ctx.attributes.aVertexColorId, rgbToV4(ctx.color[0], ctx.color[1], ctx.color[2]));
@@ -87,10 +81,12 @@ export function LightObject(gl) {
     };
 
 
-    function refreshModelMatrix() {
-        ctx.matrices.model = mat4.create();
-        mat4.translate(ctx.matrices.model, ctx.matrices.model, ctx.position);
+    this.refreshLightPosition = function(gl, newViewMatrix) {
+        let newPosition = vec3.create();
 
-        gl.uniformMatrix4fv(ctx.uniforms.uModelMatrixId, false, ctx.matrices.model);
-    }
+        ctx.matrices.view = newViewMatrix;
+        vec3.transformMat4(newPosition, ctx.position, ctx.matrices.view);
+
+        gl.uniform3fv(ctx.uniforms.uLightPositionId, newPosition);
+    };
 }
