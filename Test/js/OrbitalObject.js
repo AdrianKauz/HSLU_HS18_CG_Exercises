@@ -6,7 +6,7 @@ export function OrbitalObject() {
         parent : null,
         child : [],
         object : {
-            position : [0.0, 0.0, 0.0],
+            origin : [0.0, 0.0, 0.0],
             scaling : [1.0, 1.0, 1.0],
             initialOrientation : [0.0, 0.0, 0.0],
             currOrientation : [0.0, 0.0, 0.0],
@@ -51,6 +51,7 @@ export function OrbitalObject() {
         ctx.object.initialOrientation = [newXRotation, newYRotation, newZRotation];
     };
 
+
     /**
      * @param newVelocityX as Value in radiant/s
      * @param newVelocityY as Value in radiant/s
@@ -64,6 +65,11 @@ export function OrbitalObject() {
     //-------------------------------------------------------------------------
     // Orbit Stuff
     //-------------------------------------------------------------------------
+    this.setOrigin = function(newPosX, newPosY, newPosZ) {
+        ctx.object.origin = [newPosX, newPosY, newPosZ];
+    };
+
+
     /**
      * @param newRadius as float >= 0.0
      */
@@ -89,16 +95,18 @@ export function OrbitalObject() {
 
     this.draw = function(gl, newViewMatrix) {
         ctx.model.draw(gl, newViewMatrix);
-/*
+
         ctx.child.forEach(function (child) {
-            child.draw(gl, newViewMatrix);
-        })*/
+            //child.draw(gl, newViewMatrix);
+        })
     };
 
 
     this.refreshModel = function(deltaTime) {
         // Set initial Matrix
         ctx.matrix = (ctx.parentMatrix == null) ? mat4.create() : ctx.parentMatrix;
+
+
 
         // Tilt orbit around Y-Axis
         if(ctx.orbital.inclination !== 0.0) {
@@ -113,7 +121,7 @@ export function OrbitalObject() {
             mat4.rotateZ(ctx.matrix, ctx.matrix, ctx.orbital.orientation);
         }
 
-        // Set distance
+        // Set Radius around origin
         mat4.translate(ctx.matrix, ctx.matrix, [ctx.orbital.radius, 0.0, 0.0]);
 
         // Rotate Object around itself
@@ -148,10 +156,20 @@ export function OrbitalObject() {
             mat4.scale(ctx.matrix, ctx.matrix, ctx.object.scaling);
         }
 
+        // Move orbital Object to origin-point (not [0.0, 0.0, 0.0])
+        mat4.translate(ctx.matrix, ctx.matrix, ctx.object.origin);
+
         ctx.model.setModelMatrix(ctx.matrix);
+
+        let currPosition = vec3.create();
+        vec3.transformMat4(currPosition, currPosition, ctx.matrix);
+
+        //console.log(ctx.object.origin);
+        console.log(currPosition);
+
 /*
         ctx.child.forEach(function (child) {
-            child.setParentMatrix(ctx.matrix);
+            child.setOrigin(currPosition[0], currPosition[1], currPosition[2]);
             child.refreshModel(deltaTime);
         })*/
     }

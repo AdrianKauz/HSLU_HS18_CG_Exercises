@@ -189,12 +189,12 @@ function startup() {
 
     let moon = new OrbitalObject();
     moon.setModel(currModel);
-    moon.setObjectScaling(0.2, 0.2, 0.2);
+    moon.setObjectScaling(0.05, 0.05, 0.05);
     moon.setObjectOrientation(Math.PI/2, 0.0, 0.0);
     moon.setObjectRotationVelocity(0.0, 0.0, -0.5);
 
-    moon.setOrbitalRadius(2.0);
-    moon.setOrbitalVelocity(0.2);
+    moon.setOrbitalRadius(0.7);
+    moon.setOrbitalVelocity(0.3);
     moon.setOrbitalInclination(-20);
 
     orbitalObject.addChild(moon);
