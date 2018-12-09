@@ -97,7 +97,7 @@ export function OrbitalObject() {
         ctx.model.draw(gl, newViewMatrix);
 
         ctx.child.forEach(function (child) {
-            //child.draw(gl, newViewMatrix);
+            child.draw(gl, newViewMatrix);
         })
     };
 
@@ -106,7 +106,7 @@ export function OrbitalObject() {
         // Set initial Matrix
         ctx.matrix = (ctx.parentMatrix == null) ? mat4.create() : ctx.parentMatrix;
 
-
+        mat4.translate(ctx.matrix, ctx.matrix, ctx.object.origin);
 
         // Tilt orbit around Y-Axis
         if(ctx.orbital.inclination !== 0.0) {
@@ -156,21 +156,16 @@ export function OrbitalObject() {
             mat4.scale(ctx.matrix, ctx.matrix, ctx.object.scaling);
         }
 
-        // Move orbital Object to origin-point (not [0.0, 0.0, 0.0])
-        mat4.translate(ctx.matrix, ctx.matrix, ctx.object.origin);
-
         ctx.model.setModelMatrix(ctx.matrix);
 
         let currPosition = vec3.create();
         vec3.transformMat4(currPosition, currPosition, ctx.matrix);
 
         //console.log(ctx.object.origin);
-        console.log(currPosition);
 
-/*
         ctx.child.forEach(function (child) {
             child.setOrigin(currPosition[0], currPosition[1], currPosition[2]);
             child.refreshModel(deltaTime);
-        })*/
+        })
     }
 }

@@ -72,17 +72,17 @@ function startup() {
     initGL();
 
     ctx.textures.set("Sun", loadTexture(gl, "./img/sun.jpg"));
-    ctx.textures.set("DeepSpace", loadTexture(gl, "./img/space_8k.png"));
+    ctx.textures.set("DeepSpace", loadTexture(gl, "./img/8k_deep_space_002.png"));
     ctx.textures.set("Neptune", loadTexture(gl, "./img/2k_planet_neptune.png"));
     ctx.textures.set("NeptuneMoon", loadTexture(gl, "./img/1k_neptune_moon.png"));
 
 
-
+/*
     texBuffer[0] = loadTexture(gl, "./img/lena_512x512.png");
-    texBuffer[1] = loadTexture(gl, "./img/space_8k.png");
+    texBuffer[1] = loadTexture(gl, "./img/8k_deep_space.jpg");
     texBuffer[2] = loadTexture(gl, "./img/sun.jpg");
     texBuffer[3] = loadTexture(gl, "./img/2k_planet_neptune.jpg");
-
+*/
     // Cartesian axis
     cartesianObject = new CartesianObject();
     cartesianObject.setShaderAttributes(ctx.attributes);
@@ -122,7 +122,7 @@ function startup() {
     ctx.objects.deepSpaceSphere.setShaderUniforms(ctx.uniforms);
     ctx.objects.deepSpaceSphere.setTexture(ctx.textures.get("DeepSpace"));
     ctx.objects.deepSpaceSphere.setPosition(0.0, 0.0, 0.0);
-    ctx.objects.deepSpaceSphere.setScaling(30.0, 30.0, 30.0);
+    ctx.objects.deepSpaceSphere.setScaling(40.0, 40.0, 40.0);
     ctx.objects.deepSpaceSphere.setColor(255, 0, 0);
     ctx.objects.deepSpaceSphere.setRotation(Math.PI/2.7,0,0);
 
@@ -158,8 +158,14 @@ function startup() {
     cameraViewMatrix.setDistance(5.0);
 
 
+    let sun = new OrbitalObject();
+    sun.setObjectScaling(0.2, 0.2, 0.2);
+    sun.setObjectOrientation(Math.PI/2, 0.0, 0.0);
+    sun.setObjectRotationVelocity(0.0, 0.0, -0.5);
 
-
+    sun.setOrbitalRadius(2.0);
+    sun.setOrbitalVelocity(0.1);
+    sun.setOrbitalInclination(-20);
 
 
 
@@ -178,7 +184,7 @@ function startup() {
     orbitalObject.setObjectRotationVelocity(0.0, 0.0, -0.5);
 
     orbitalObject.setOrbitalRadius(2.0);
-    orbitalObject.setOrbitalVelocity(0.2);
+    orbitalObject.setOrbitalVelocity(0.1);
     orbitalObject.setOrbitalInclination(-20);
 
     // Moon
@@ -191,17 +197,30 @@ function startup() {
     moon.setModel(currModel);
     moon.setObjectScaling(0.05, 0.05, 0.05);
     moon.setObjectOrientation(Math.PI/2, 0.0, 0.0);
-    moon.setObjectRotationVelocity(0.0, 0.0, -0.5);
+    moon.setObjectRotationVelocity(0.0, 0.0, 0.5);
 
     moon.setOrbitalRadius(0.7);
-    moon.setOrbitalVelocity(0.3);
+    moon.setOrbitalVelocity(0.7);
     moon.setOrbitalInclination(-20);
 
     orbitalObject.addChild(moon);
 
+    currModel = new SimpleSolidSphere(gl, 20, 20);
+    currModel.setShaderAttributes(ctx.attributes);
+    currModel.setShaderUniforms(ctx.uniforms);
+    currModel.setTexture(ctx.textures.get("NeptuneMoon"));
 
+    let moonMoon = new OrbitalObject();
+    moonMoon.setModel(currModel);
+    moonMoon.setObjectScaling(0.02, 0.02, 0.02);
+    moonMoon.setObjectOrientation(Math.PI/2, 0.0, 0.0);
+    moonMoon.setObjectRotationVelocity(0.0, 0.0, 0.5);
 
+    moonMoon.setOrbitalRadius(0.2);
+    moonMoon.setOrbitalVelocity(2.0);
+    moonMoon.setOrbitalInclination(40);
 
+    moon.addChild(moonMoon);
 
 
 
