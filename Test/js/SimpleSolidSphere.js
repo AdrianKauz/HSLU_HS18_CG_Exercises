@@ -25,7 +25,8 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
             uModelMatrixId : -1,
             uViewMatrixId : -1,
             uNormalMatrixId : -1,
-            uSamplerId : -1
+            uSamplerId : -1,
+            uEnableLightingId : -1
         },
         latitudeBands : newLatitudeBands,
         longitudeBands : newLongitudeBands,
@@ -46,7 +47,8 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         indices : [],
         textures : [],
         color : [255, 0, 0],
-        texture : null
+        texture : null,
+        isLighted : false
     };
 
     // Generate Vertices, Indices, Normals and Texturecoords
@@ -74,6 +76,7 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         ctx.uniforms.uViewMatrixId = newUniforms.uViewMatrixId;
         ctx.uniforms.uNormalMatrixId = newUniforms.uNormalMatrixId;
         ctx.uniforms.uSamplerId = newUniforms.uSamplerId;
+        ctx.uniforms.uEnableLightingId = newUniforms.uEnableLightingId;
     };
 
 
@@ -84,6 +87,16 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
 
     this.setModelMatrix = function(newModelmatrix) {
         ctx.matrices.model = newModelmatrix;
+    };
+
+
+    this.enableLighting = function() {
+        ctx.isLighted = true;
+    };
+
+
+    this.disableLighting = function() {
+        ctx.isLighted = false;
     };
 
 
@@ -125,6 +138,11 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         gl.enableVertexAttribArray(ctx.attributes.aVertexNormalId);
         gl.vertexAttribPointer(ctx.attributes.aVertexNormalId, 3, gl.FLOAT, false, 0, 0);
 
+        // model reacts with lighting
+        if(ctx.isLighted) {
+            gl.uniform1i(ctx.uniforms.uEnableLightingId, 1);
+        }
+
         // elements
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ctx.buffer.indices);
         gl.drawElements(gl.TRIANGLES, ctx.triangleCounter * 3 ,gl.UNSIGNED_SHORT, 0);
@@ -137,6 +155,7 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         gl.disableVertexAttribArray(ctx.attributes.aVertexPositionId);
         gl.disableVertexAttribArray(ctx.attributes.aVertexNormalId);
         gl.disableVertexAttribArray(ctx.attributes.aVertexColorId);
+        gl.uniform1i(ctx.uniforms.uEnableLightingId, 0);
     };
 
 

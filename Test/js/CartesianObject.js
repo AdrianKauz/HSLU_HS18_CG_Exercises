@@ -84,9 +84,9 @@ export function CartesianObject() {
 
         // X-Axis
         for (let x = -newNumberOfTicks; x <= newNumberOfTicks; x++) {
-            pointsXAxis.push(x * stepSize * 3, 0.0, 0.0);
-            pointsYAxis.push(0.0, x * stepSize * 3, 0.0);
-            pointsZAxis.push(0.0, 0.0, x * stepSize * 3);
+            pointsXAxis.push(x * stepSize, 0.0, 0.0);
+            pointsYAxis.push(0.0, x * stepSize, 0.0);
+            pointsZAxis.push(0.0, 0.0, x * stepSize);
         }
 
         return pointsXAxis.concat(pointsYAxis).concat(pointsZAxis);

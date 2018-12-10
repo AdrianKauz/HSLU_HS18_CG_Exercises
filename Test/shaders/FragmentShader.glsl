@@ -11,9 +11,9 @@ uniform sampler2D uSampler;
 uniform vec3 uLightPosition;
 uniform vec3 uLightColor;
 
-const float ambientFactor = 0.2;
-const float shininess = 30.0;
-const vec3 specularMaterialColor = vec3(0.3, 0.3, 0.3);
+const float ambientFactor = 0.1;
+const float shininess = 10.0;
+const vec3 specularMaterialColor = vec3(0.4, 0.4, 0.4);
 
 void main() {
     vec4 baseColor = (uEnableTexture) ? texture2D(uSampler, vTextureCoord) : vColor;

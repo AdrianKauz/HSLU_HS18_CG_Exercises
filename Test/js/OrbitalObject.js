@@ -10,7 +10,7 @@ export function OrbitalObject() {
             scaling : [1.0, 1.0, 1.0],
             initialOrientation : [0.0, 0.0, 0.0],
             currOrientation : [0.0, 0.0, 0.0],
-            rotationVelocity : [0.0, 0.0, 0.0],
+            rotationVelocity : [0.0, 0.0, 0.0]
         },
         orbital : {
             velocity : 0.0,
@@ -43,8 +43,15 @@ export function OrbitalObject() {
     //-------------------------------------------------------------------------
     // Object Stuff
     //-------------------------------------------------------------------------
-    this.setObjectScaling = function(newXScale, newYScale, newZScale) {
-        ctx.object.scaling = [newXScale, newYScale, newZScale];
+    this.setObjectScaling = function(newScale1, newScale2, newScale3) {
+        if(newScale2 == null && newScale3 == null) {
+            // It's a Sphere
+            ctx.object.scaling = [newScale1, newScale1, newScale1];
+        }
+        else {
+            // It's a Ellipsoid
+            ctx.object.scaling = [newScale1, newScale2, newScale3];
+        }
     };
 
     this.setObjectOrientation = function(newXRotation, newYRotation, newZRotation,) {
