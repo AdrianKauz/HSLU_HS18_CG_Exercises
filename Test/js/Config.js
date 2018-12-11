@@ -57,7 +57,7 @@ export function Config() {
             orbit : {
                 velocity : 27.322,
                 inclination : 10.0,
-                radius : 20000000000
+                radius : 25000000000
             }
         },
         mars : {

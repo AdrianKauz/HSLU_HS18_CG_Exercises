@@ -78,7 +78,7 @@ function startup() {
     initGL();
 
     ctx.textures.set("Sun", loadTexture(gl, "./img/sun.jpg"));
-    ctx.textures.set("DeepSpace", loadTexture(gl, "./img/8k_deep_space_004.png"));
+    ctx.textures.set("DeepSpace", loadTexture(gl, "./img/8k_deep_space_004.jpg"));
     ctx.textures.set("Mercury", loadTexture(gl, "./img/2k_planet_mercury.jpg"));
     ctx.textures.set("NeptuneMoon", loadTexture(gl, "./img/1k_neptune_moon.png"));
     ctx.textures.set("Earth", loadTexture(gl, "./img/2k_planet_earth_with_clouds.jpg"));
@@ -106,14 +106,14 @@ function startup() {
     ctx.objects.deepSpaceSphere.setPosition(0.0, 0.0, 0.0);
     ctx.objects.deepSpaceSphere.setScaling(40.0, 40.0, 40.0);
     ctx.objects.deepSpaceSphere.setColor(255, 0, 0);
-    ctx.objects.deepSpaceSphere.setRotation(Math.PI/2.7,0,0);
+    ctx.objects.deepSpaceSphere.setRotation(Math.PI/2.7,0,Math.PI);
 
     // Light Object
     lightObject = new LightObject(gl);
     lightObject.setShaderAttributes(ctx.attributes);
     lightObject.setShaderUniforms(ctx.uniforms);
     lightObject.setPosition(0.0, 0.0, 0.0);
-    lightObject.setColor(255, 255, 255);
+    lightObject.setColor(255, 255, 235);
     lightObject.init(gl);
 
     // CameraMatrix
