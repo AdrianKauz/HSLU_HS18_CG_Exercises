@@ -7,6 +7,7 @@ import { SolidSphere } from './SolidSphere.js';
 import { SimpleSolidSphere } from './SimpleSolidSphere.js';
 import { LightObject } from './LightObject.js';
 import { OrbitalObject } from './OrbitalObject.js';
+import { Config } from './Config.js';
 
 // Register function to call after document has loaded
 window.onload = startup;
@@ -23,6 +24,8 @@ let canvasHeight = 0;
 let canvasWidth = 0;
 const keyPressManager = new KeyPressManager();
 const cameraViewMatrix = new CameraViewMatrix();
+
+const config = new Config();
 
 const ctx = {
     shaderProgram : -1,
@@ -75,11 +78,14 @@ function startup() {
     initGL();
 
     ctx.textures.set("Sun", loadTexture(gl, "./img/sun.jpg"));
-    ctx.textures.set("DeepSpace", loadTexture(gl, "./img/8k_deep_space_002.jpg"));
+    ctx.textures.set("DeepSpace", loadTexture(gl, "./img/8k_deep_space_004.png"));
     ctx.textures.set("Mercury", loadTexture(gl, "./img/2k_planet_mercury.jpg"));
     ctx.textures.set("NeptuneMoon", loadTexture(gl, "./img/1k_neptune_moon.png"));
-    ctx.textures.set("Earth", loadTexture(gl, "./img/2k_planet_earth.jpg"));
+    ctx.textures.set("Earth", loadTexture(gl, "./img/2k_planet_earth_with_clouds.jpg"));
     ctx.textures.set("Venus", loadTexture(gl, "./img/2k_planet_venus.jpg"));
+    ctx.textures.set("Mars", loadTexture(gl, "./img/2k_planet_mars.jpg"));
+    ctx.textures.set("Jupiter", loadTexture(gl, "./img/2k_planet_jupiter.jpg"));
+    ctx.textures.set("Moon", loadTexture(gl, "./img/2k_moon.jpg"));
 
     // Cartesian axis
     cartesianObject = new CartesianObject();
@@ -114,7 +120,7 @@ function startup() {
     cameraViewMatrix.setPosition(-Math.PI/3, Math.PI/3*2, Math.PI / 5);
     cameraViewMatrix.setUpDirection(0.0, 0.0, 1.0);
     cameraViewMatrix.setLookAtPosition(0.0, 0.0, 0.0);
-    cameraViewMatrix.setDistance(1.0);
+    cameraViewMatrix.setDistance(5.0);
 
     // ProjektionMatrix
     setUpProjectionMatrix();
@@ -133,13 +139,9 @@ function defineOrbitalObjects() {
     sunModel.setShaderAttributes(ctx.attributes);
     sunModel.setShaderUniforms(ctx.uniforms);
     sunModel.setTexture(ctx.textures.get("Sun"));
-    //sunModel.enableLighting();
 
     let sunObject = new OrbitalObject();
-    sunObject.setModel(sunModel);
-    sunObject.setObjectScaling(0.1);
-    sunObject.setObjectRotationVelocity(0.02, 0.02, 0.02);
-    sunObject.setObjectOrientation(-Math.PI/2, 0.0, 0.0);
+    sunObject.setAllInOneConfig(sunModel, config.orbitalObjects.sun, config.dimensions);
 
     let mercuryModel = new SimpleSolidSphere(gl, 40, 40);
     mercuryModel.setShaderAttributes(ctx.attributes);
@@ -148,13 +150,7 @@ function defineOrbitalObjects() {
     mercuryModel.enableLighting();
 
     let mercuryObject = new OrbitalObject();
-    mercuryObject.setModel(mercuryModel);
-    mercuryObject.setObjectScaling(0.035);
-    mercuryObject.setObjectRotationVelocity(0.2, 0.0, 0.0);
-    mercuryObject.setObjectOrientation(Math.PI/2, 0.0, 0.0);
-    mercuryObject.setOrbitalRadius(0.41);
-    mercuryObject.setOrbitalInclination(7.00487);
-    mercuryObject.setOrbitalVelocity(getAngularVelocityFromSynodicPeriod(115.88));
+    mercuryObject.setAllInOneConfig(mercuryModel, config.orbitalObjects.mercury, config.dimensions);
 
     let venusModel = new SimpleSolidSphere(gl, 40, 40);
     venusModel.setShaderAttributes(ctx.attributes);
@@ -163,13 +159,7 @@ function defineOrbitalObjects() {
     venusModel.enableLighting();
 
     let venusObject = new OrbitalObject();
-    venusObject.setModel(venusModel);
-    venusObject.setObjectScaling(0.086);
-    venusObject.setObjectRotationVelocity(0.2, 0.0, 0.0);
-    venusObject.setObjectOrientation(Math.PI/2, 0.0, 0.0);
-    venusObject.setOrbitalRadius(0.77);
-    venusObject.setOrbitalInclination(3.395);
-    venusObject.setOrbitalVelocity(getAngularVelocityFromSynodicPeriod(583.92));
+    venusObject.setAllInOneConfig(venusModel, config.orbitalObjects.venus, config.dimensions);
 
     let earthModel = new SimpleSolidSphere(gl, 40, 40);
     earthModel.setShaderAttributes(ctx.attributes);
@@ -178,26 +168,44 @@ function defineOrbitalObjects() {
     earthModel.enableLighting();
 
     let earthObject = new OrbitalObject();
-    earthObject.setModel(earthModel);
-    earthObject.setObjectScaling(0.091);
-    earthObject.setObjectRotationVelocity(0.2, 0.0, 0.0);
-    earthObject.setObjectOrientation(Math.PI/2, 0.0, 0.0);
-    earthObject.setOrbitalRadius(1.07);
-    earthObject.setOrbitalInclination(3.395);
-    earthObject.setOrbitalVelocity(getAngularVelocityFromSynodicPeriod(365.256363004));
+    earthObject.setAllInOneConfig(earthModel, config.orbitalObjects.earth, config.dimensions);
+
+    let moonModel = new SimpleSolidSphere(gl, 40, 40);
+    moonModel.setShaderAttributes(ctx.attributes);
+    moonModel.setShaderUniforms(ctx.uniforms);
+    moonModel.setTexture(ctx.textures.get("Moon"));
+    moonModel.enableLighting();
+
+    let moonObject = new OrbitalObject();
+    moonObject.setAllInOneConfig(moonModel, config.orbitalObjects.moon, config.dimensions);
+
+    let marsModel = new SimpleSolidSphere(gl, 40, 40);
+    marsModel.setShaderAttributes(ctx.attributes);
+    marsModel.setShaderUniforms(ctx.uniforms);
+    marsModel.setTexture(ctx.textures.get("Mars"));
+    marsModel.enableLighting();
+
+    let marsObject = new OrbitalObject();
+    marsObject.setAllInOneConfig(marsModel, config.orbitalObjects.mars, config.dimensions);
+
+    let jupiterModel = new SimpleSolidSphere(gl, 40, 40);
+    jupiterModel.setShaderAttributes(ctx.attributes);
+    jupiterModel.setShaderUniforms(ctx.uniforms);
+    jupiterModel.setTexture(ctx.textures.get("Jupiter"));
+    jupiterModel.enableLighting();
+
+    let jupiterObject = new OrbitalObject();
+    jupiterObject.setAllInOneConfig(jupiterModel, config.orbitalObjects.jupiter, config.dimensions);
 
 
     sunObject.addChild(mercuryObject);
     sunObject.addChild(venusObject);
+    earthObject.addChild(moonObject);
     sunObject.addChild(earthObject);
+    sunObject.addChild(marsObject);
+    sunObject.addChild(jupiterObject);
 
     ctx.objects.orbitalChain = sunObject;
-}
-
-
-function getAngularVelocityFromSynodicPeriod(newValue) {
-    let fasterThanEarthFactor = 365.256363004 / newValue;
-    return Math.PI * 2 / 100 * fasterThanEarthFactor;
 }
 
 
@@ -210,6 +218,7 @@ function initGL() {
     setUpAttributesAndUniforms();
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clearDepth(1.0);
+    gl.enable(gl.DEPTH_TEST);
 }
 
 
@@ -239,7 +248,7 @@ function setUpProjectionMatrix() {
     const projectionMatrix = mat4.create();
     const fieldOfView = glMatrix.toRadian(40) /*Math.PI * 0.5*/;
     const aspect = ctx.canvas.ratio;
-    const zNear = 0.0001;
+    const zNear = 0.001;
     const zFar = 55.0;
 
     mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
@@ -311,7 +320,6 @@ function refreshScene(deltaTime) {
  */
 function drawScene() {
     "use strict";
-    gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 

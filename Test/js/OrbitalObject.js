@@ -1,7 +1,6 @@
 export function OrbitalObject() {
     const ctx = {
         model : null,
-        parentMatrix : null,
         matrix : null,
         parent : null,
         child : [],
@@ -21,19 +20,10 @@ export function OrbitalObject() {
     };
 
 
-    this.setParentMatrix = function(newMatrix) {
-        ctx.parentMatrix = newMatrix;
-    }
-
-
     this.setModel = function(newModel) {
         ctx.model = newModel;
     };
 
-
-    this.getModel = function() {
-        return ctx.model;
-    };
 
     this.addChild = function(newChild) {
         ctx.child.push(newChild);
@@ -100,6 +90,29 @@ export function OrbitalObject() {
     };
 
 
+    this.setAllInOneConfig = function(newModel, newObjectConfig, newDimensionConfig) {
+        ctx.model = newModel;
+
+        let scaling = newObjectConfig.object.diameter / 2 * newDimensionConfig.object;
+        ctx.object.scaling = [scaling, scaling, scaling];
+
+        ctx.object.initialOrientation = newObjectConfig.object.orientation;
+        ctx.object.rotationVelocity = newObjectConfig.object.rotationVelocity;
+        ctx.orbital.inclination = newObjectConfig.orbit.inclination;
+        ctx.orbital.radius = newObjectConfig.orbit.radius * newDimensionConfig.radius;
+
+        if(newObjectConfig.orbit.velocity > 0) {
+            ctx.orbital.velocity = (newDimensionConfig.sydericPeriod / newObjectConfig.orbit.velocity) * (2 * Math.PI) / newDimensionConfig.orbitalPeriodSimulation;
+        }
+
+        ctx.orbital.velocity
+
+        console.log(ctx.orbital.radius);
+        console.log(ctx.orbital.velocity);
+    };
+
+
+
     this.draw = function(gl, newViewMatrix) {
         ctx.model.draw(gl, newViewMatrix);
 
@@ -111,8 +124,9 @@ export function OrbitalObject() {
 
     this.refreshModel = function(deltaTime) {
         // Set initial Matrix
-        ctx.matrix = (ctx.parentMatrix == null) ? mat4.create() : ctx.parentMatrix;
+        ctx.matrix = mat4.create();
 
+        // Move Object to final position. For Example: Moon to his Earth etc.
         mat4.translate(ctx.matrix, ctx.matrix, ctx.object.origin);
 
         // Tilt orbit around Y-Axis
@@ -130,6 +144,11 @@ export function OrbitalObject() {
 
         // Set Radius around origin
         mat4.translate(ctx.matrix, ctx.matrix, [ctx.orbital.radius, 0.0, 0.0]);
+
+        // Initial Orientation
+        mat4.rotateX(ctx.matrix, ctx.matrix, ctx.object.initialOrientation[0]);
+        mat4.rotateY(ctx.matrix, ctx.matrix, ctx.object.initialOrientation[1]);
+        mat4.rotateZ(ctx.matrix, ctx.matrix, ctx.object.initialOrientation[2]);
 
         // Rotate Object around itself
         if(ctx.object.rotationVelocity[0] !== 0.0) {
@@ -153,10 +172,6 @@ export function OrbitalObject() {
             mat4.rotateZ(ctx.matrix, ctx.matrix, ctx.object.currOrientation[2]);
         }
 
-        // Initial Orientation
-        mat4.rotateX(ctx.matrix, ctx.matrix, ctx.object.initialOrientation[0]);
-        mat4.rotateY(ctx.matrix, ctx.matrix, ctx.object.initialOrientation[1]);
-        mat4.rotateZ(ctx.matrix, ctx.matrix, ctx.object.initialOrientation[2]);
 
         // Scale Object
         if((ctx.object.scaling[0] !== 1.0) && (ctx.object.scaling[1] !== 1.0) && (ctx.object.scaling[2] !== 1.0)) {

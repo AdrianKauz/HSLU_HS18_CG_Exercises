@@ -12,8 +12,8 @@ uniform vec3 uLightPosition;
 uniform vec3 uLightColor;
 
 const float ambientFactor = 0.1;
-const float shininess = 10.0;
-const vec3 specularMaterialColor = vec3(0.4, 0.4, 0.4);
+const float shininess = 60.0;
+const vec3 specularMaterialColor = vec3(0.3, 0.3, 0.3);
 
 void main() {
     vec4 baseColor = (uEnableTexture) ? texture2D(uSampler, vTextureCoord) : vColor;
