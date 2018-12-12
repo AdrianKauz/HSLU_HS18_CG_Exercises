@@ -86,6 +86,8 @@ function startup() {
     ctx.textures.set("Mars", loadTexture(gl, "./img/2k_planet_mars.jpg"));
     ctx.textures.set("Jupiter", loadTexture(gl, "./img/2k_planet_jupiter.jpg"));
     ctx.textures.set("Moon", loadTexture(gl, "./img/2k_moon.jpg"));
+    ctx.textures.set("Europa", loadTexture(gl, "./img/2k_moon_europa.jpg"));
+    ctx.textures.set("Ganymede", loadTexture(gl, "./img/2k_moon_ganymede.jpg"));
 
     // Cartesian axis
     cartesianObject = new CartesianObject();
@@ -197,6 +199,24 @@ function defineOrbitalObjects() {
     let jupiterObject = new OrbitalObject();
     jupiterObject.setAllInOneConfig(jupiterModel, config.orbitalObjects.jupiter, config.dimensions);
 
+    let europaModel = new SimpleSolidSphere(gl, 40, 40);
+    europaModel.setShaderAttributes(ctx.attributes);
+    europaModel.setShaderUniforms(ctx.uniforms);
+    europaModel.setTexture(ctx.textures.get("Europa"));
+    europaModel.enableLighting();
+
+    let europaObject = new OrbitalObject();
+    europaObject.setAllInOneConfig(europaModel, config.orbitalObjects.europa, config.dimensions);
+
+    let ganymedeModel = new SimpleSolidSphere(gl, 40, 40);
+    ganymedeModel.setShaderAttributes(ctx.attributes);
+    ganymedeModel.setShaderUniforms(ctx.uniforms);
+    ganymedeModel.setTexture(ctx.textures.get("Ganymede"));
+    ganymedeModel.enableLighting();
+
+    let ganymedeObject = new OrbitalObject();
+    ganymedeObject.setAllInOneConfig(ganymedeModel, config.orbitalObjects.ganymede, config.dimensions);
+
 
     sunObject.addChild(mercuryObject);
     sunObject.addChild(venusObject);
@@ -204,6 +224,8 @@ function defineOrbitalObjects() {
     sunObject.addChild(earthObject);
     sunObject.addChild(marsObject);
     sunObject.addChild(jupiterObject);
+    jupiterObject.addChild(europaObject);
+    jupiterObject.addChild(ganymedeObject);
 
     ctx.objects.orbitalChain = sunObject;
 }

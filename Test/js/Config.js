@@ -75,7 +75,7 @@ export function Config() {
         jupiter : {
             object : {
                 diameter : 139822000,
-                orientation : [-Math.PI/1.9, 0.0, 0.0],
+                orientation : [-Math.PI/1.6, 0.0, 0.0],
                 rotationVelocity : [0.0, 0.1, 0.0]
             },
             orbit : {
@@ -84,13 +84,37 @@ export function Config() {
                 radius : 778500000000
             }
         },
+        europa : {
+            object : {
+                diameter : 3122000,
+                orientation : [-Math.PI/1.9, 0.0, 0.0],
+                rotationVelocity : [0.0, 0.2, 0.0]
+            },
+            orbit : {
+                velocity : 3.551,
+                inclination : 0.470,
+                radius : 370900000000
+            }
+        },
+        ganymede : {
+            object : {
+                diameter : 5268000,
+                orientation : [-Math.PI/1.9, 0.0, 0.0],
+                rotationVelocity : [0.0, 0.2, 0.0]
+            },
+            orbit : {
+                velocity : 7.155,
+                inclination : 2.18,
+                radius : 470400000000
+            }
+        },
     };
 
     this.dimensions = {
         object : 0.00000001,
         radius : 0.0000000000050,
         sydericPeriod : 365.256363004,
-        orbitalPeriodSimulation : 100 // Value in Seconds
+        orbitalPeriodSimulation : 500 // Value in Seconds
     }
 
 }
