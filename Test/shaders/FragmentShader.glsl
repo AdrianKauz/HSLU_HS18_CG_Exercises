@@ -6,13 +6,14 @@ varying vec3 vNormal;
 
 uniform bool uEnableTexture;
 uniform bool uEnableLighting;
+uniform bool uEnableSpecular;
 
 uniform sampler2D uSampler;
 uniform vec3 uLightPosition;
 uniform vec3 uLightColor;
 
 const float ambientFactor = 0.1;
-const float shininess = 10.0;
+const float shininess = 20.0;
 const vec3 specularMaterialColor = vec3(0.2, 0.2, 0.2);
 
 void main() {
@@ -34,7 +35,8 @@ void main() {
 
         // specular lighting
         vec3 specularColor = vec3(0, 0, 0);
-        if (diffuseFactor > 0.0) {
+
+        if (uEnableSpecular && diffuseFactor > 0.0) {
            vec3 reflectionDir = reflect(surfaceToLightDirection, normal);
            vec3 eyeDir = normalize(vVertexPositionEye);
            float cosPhi = max(dot(reflectionDir, eyeDir), 0.0);

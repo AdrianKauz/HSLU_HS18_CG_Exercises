@@ -26,7 +26,8 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
             uViewMatrixId : -1,
             uNormalMatrixId : -1,
             uSamplerId : -1,
-            uEnableLightingId : -1
+            uEnableLightingId : -1,
+            uEnableSpecularId : -1
         },
         latitudeBands : newLatitudeBands,
         longitudeBands : newLongitudeBands,
@@ -48,7 +49,8 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         textures : [],
         color : [255, 0, 0],
         texture : null,
-        isLighted : false
+        isLighted : false,
+        enableAlpha : false
     };
 
     // Generate Vertices, Indices, Normals and Texturecoords
@@ -77,6 +79,7 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         ctx.uniforms.uNormalMatrixId = newUniforms.uNormalMatrixId;
         ctx.uniforms.uSamplerId = newUniforms.uSamplerId;
         ctx.uniforms.uEnableLightingId = newUniforms.uEnableLightingId;
+        ctx.uniforms.uEnableSpecularId = newUniforms.uEnableSpecularId;
     };
 
 
@@ -92,6 +95,11 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
 
     this.enableLighting = function() {
         ctx.isLighted = true;
+    };
+
+
+    this.enableAlpha = function() {
+        ctx.enableAlpha = true;
     };
 
 
@@ -143,19 +151,30 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
             gl.uniform1i(ctx.uniforms.uEnableLightingId, 1);
         }
 
+        // transparency
+        if(ctx.enableAlpha) {
+            gl.enable(gl.BLEND);
+            gl.uniform1i(ctx.uniforms.uEnableSpecularId, 0);
+        }
+
         // elements
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ctx.buffer.indices);
         gl.drawElements(gl.TRIANGLES, ctx.triangleCounter * 3 ,gl.UNSIGNED_SHORT, 0);
 
-        // disable the arrays
+        // disable the arrays, alpha, lighting
         if(ctx.texture != null) {
             gl.disableVertexAttribArray(ctx.aTextureCoordId);
+        }
+
+        if(ctx.enableAlpha) {
+            gl.disable(gl.BLEND);
         }
 
         gl.disableVertexAttribArray(ctx.attributes.aVertexPositionId);
         gl.disableVertexAttribArray(ctx.attributes.aVertexNormalId);
         gl.disableVertexAttribArray(ctx.attributes.aVertexColorId);
         gl.uniform1i(ctx.uniforms.uEnableLightingId, 0);
+        gl.uniform1i(ctx.uniforms.uEnableSpecularId, 1);
     };
 
 

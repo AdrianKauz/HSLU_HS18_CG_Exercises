@@ -48,6 +48,18 @@ export function Config() {
                 radius : 149600000000
             }
         },
+        earthClouds : {
+            object : {
+                diameter : 12937000,
+                orientation : [-Math.PI/1.9, 0.0, 0.0],
+                rotationVelocity : [0.0, 0.15, 0.0]
+            },
+            orbit : {
+                velocity : 365.256363004,
+                inclination : 3.395,
+                radius : 149600000000
+            }
+        },
         moon : {
             object : {
                 diameter : 3474000,
@@ -75,7 +87,7 @@ export function Config() {
         jupiter : {
             object : {
                 diameter : 139822000,
-                orientation : [-Math.PI/1.6, 0.0, 0.0],
+                orientation : [-Math.PI/1.8, 0.0, 0.0],
                 rotationVelocity : [0.0, 0.1, 0.0]
             },
             orbit : {
@@ -84,7 +96,19 @@ export function Config() {
                 radius : 778500000000
             }
         },
-        europa : {
+        jupiterIo : {
+            object : {
+                diameter : 3643200,
+                orientation : [-Math.PI/1.9, 0.0, 0.0],
+                rotationVelocity : [0.0, 0.2, 0.0]
+            },
+            orbit : {
+                velocity : 1.769,
+                inclination : 0.04,
+                radius : 230900000000
+            }
+        },
+        jupiterEuropa : {
             object : {
                 diameter : 3122000,
                 orientation : [-Math.PI/1.9, 0.0, 0.0],
@@ -96,7 +120,7 @@ export function Config() {
                 radius : 370900000000
             }
         },
-        ganymede : {
+        jupiterGanymede : {
             object : {
                 diameter : 5268000,
                 orientation : [-Math.PI/1.9, 0.0, 0.0],
@@ -108,13 +132,37 @@ export function Config() {
                 radius : 470400000000
             }
         },
+        jupiterCallisto : {
+            object : {
+                diameter : 4820600,
+                orientation : [-Math.PI/1.9, 0.0, 0.0],
+                rotationVelocity : [0.0, 0.2, 0.0]
+            },
+            orbit : {
+                velocity : 16.689,
+                inclination : 20.00,
+                radius : 870400000000
+            }
+        },
+        saturn : {
+            object : {
+                diameter : 120500000,
+                orientation : [-Math.PI/3, 0.0, 0.0],
+                rotationVelocity : [0.0, 0.2, 0.0]
+            },
+            orbit : {
+                velocity : 10759.356685008828,
+                inclination : 2.484,
+                radius : 1430000000000
+            }
+        },
     };
 
     this.dimensions = {
         object : 0.00000001,
         radius : 0.0000000000050,
         sydericPeriod : 365.256363004,
-        orbitalPeriodSimulation : 500 // Value in Seconds
+        orbitalPeriodSimulation : 300 // Value in Seconds
     }
 
 }

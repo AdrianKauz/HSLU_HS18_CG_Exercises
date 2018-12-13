@@ -106,9 +106,6 @@ export function OrbitalObject() {
         }
 
         ctx.orbital.velocity
-
-        console.log(ctx.orbital.radius);
-        console.log(ctx.orbital.velocity);
     };
 
 
@@ -182,8 +179,6 @@ export function OrbitalObject() {
 
         let currPosition = vec3.create();
         vec3.transformMat4(currPosition, currPosition, ctx.matrix);
-
-        //console.log(ctx.object.origin);
 
         ctx.child.forEach(function (child) {
             child.setOrigin(currPosition[0], currPosition[1], currPosition[2]);

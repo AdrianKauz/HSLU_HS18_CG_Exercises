@@ -75,19 +75,25 @@ function startup() {
     ctx.canvas.width = canvas.width;
     ctx.canvas.ratio = ctx.canvas.width / ctx.canvas.height;
     gl = createGLContext(canvas);
+
     initGL();
 
-    ctx.textures.set("Sun", loadTexture(gl, "./img/sun.jpg"));
+    ctx.textures.set("NeptuneMoon", loadTexture(gl, "./img/1k_neptune_moon.jpg"));
+    ctx.textures.set("Earth", loadTexture(gl, "./img/2k_planet_earth.jpg"));
+    ctx.textures.set("Sun", loadTexture(gl, "./img/2k_sun.jpg"));
     ctx.textures.set("DeepSpace", loadTexture(gl, "./img/8k_deep_space_004.jpg"));
     ctx.textures.set("Mercury", loadTexture(gl, "./img/2k_planet_mercury.jpg"));
-    ctx.textures.set("NeptuneMoon", loadTexture(gl, "./img/1k_neptune_moon.png"));
-    ctx.textures.set("Earth", loadTexture(gl, "./img/2k_planet_earth_with_clouds.jpg"));
-    ctx.textures.set("Venus", loadTexture(gl, "./img/2k_planet_venus.jpg"));
+    ctx.textures.set("Venus", loadTexture(gl, "./img/1k_planet_venus.jpg"));
     ctx.textures.set("Mars", loadTexture(gl, "./img/2k_planet_mars.jpg"));
+    ctx.textures.set("Moon", loadTexture(gl, "./img/1k_moon.jpg"));
     ctx.textures.set("Jupiter", loadTexture(gl, "./img/2k_planet_jupiter.jpg"));
-    ctx.textures.set("Moon", loadTexture(gl, "./img/2k_moon.jpg"));
-    ctx.textures.set("Europa", loadTexture(gl, "./img/2k_moon_europa.jpg"));
-    ctx.textures.set("Ganymede", loadTexture(gl, "./img/2k_moon_ganymede.jpg"));
+    ctx.textures.set("Jupiter - Europa", loadTexture(gl, "./img/1k_planet_jupiter_moon_europa.jpg"));
+    ctx.textures.set("Jupiter - Ganymede", loadTexture(gl, "./img/1k_planet_jupiter_moon_ganymede.jpg"));
+    ctx.textures.set("Jupiter - Io", loadTexture(gl, "./img/1k_planet_jupiter_moon_io.jpg"));
+    ctx.textures.set("Jupiter - Callisto", loadTexture(gl, "./img/1k_planet_jupiter_moon_callisto.jpg"));
+    ctx.textures.set("Saturn", loadTexture(gl, "./img/2k_planet_saturn.jpg"));
+
+    ctx.textures.set("Earth - Clouds", loadTexture(gl, "./img/1k_planet_earth_clouds.png"));
 
     // Cartesian axis
     cartesianObject = new CartesianObject();
@@ -163,7 +169,7 @@ function defineOrbitalObjects() {
     let venusObject = new OrbitalObject();
     venusObject.setAllInOneConfig(venusModel, config.orbitalObjects.venus, config.dimensions);
 
-    let earthModel = new SimpleSolidSphere(gl, 40, 40);
+    let earthModel = new SimpleSolidSphere(gl, 60, 60);
     earthModel.setShaderAttributes(ctx.attributes);
     earthModel.setShaderUniforms(ctx.uniforms);
     earthModel.setTexture(ctx.textures.get("Earth"));
@@ -172,7 +178,17 @@ function defineOrbitalObjects() {
     let earthObject = new OrbitalObject();
     earthObject.setAllInOneConfig(earthModel, config.orbitalObjects.earth, config.dimensions);
 
-    let moonModel = new SimpleSolidSphere(gl, 40, 40);
+    let earthCloudsModel = new SimpleSolidSphere(gl, 60, 60);
+    earthCloudsModel.setShaderAttributes(ctx.attributes);
+    earthCloudsModel.setShaderUniforms(ctx.uniforms);
+    earthCloudsModel.setTexture(ctx.textures.get("Earth - Clouds"));
+    earthCloudsModel.enableLighting();
+    earthCloudsModel.enableAlpha();
+
+    let earthCloudsObject = new OrbitalObject();
+    earthCloudsObject.setAllInOneConfig(earthCloudsModel, config.orbitalObjects.earthClouds, config.dimensions);
+
+    let moonModel = new SimpleSolidSphere(gl, 15, 15);
     moonModel.setShaderAttributes(ctx.attributes);
     moonModel.setShaderUniforms(ctx.uniforms);
     moonModel.setTexture(ctx.textures.get("Moon"));
@@ -190,7 +206,7 @@ function defineOrbitalObjects() {
     let marsObject = new OrbitalObject();
     marsObject.setAllInOneConfig(marsModel, config.orbitalObjects.mars, config.dimensions);
 
-    let jupiterModel = new SimpleSolidSphere(gl, 40, 40);
+    let jupiterModel = new SimpleSolidSphere(gl, 60, 60);
     jupiterModel.setShaderAttributes(ctx.attributes);
     jupiterModel.setShaderUniforms(ctx.uniforms);
     jupiterModel.setTexture(ctx.textures.get("Jupiter"));
@@ -199,33 +215,64 @@ function defineOrbitalObjects() {
     let jupiterObject = new OrbitalObject();
     jupiterObject.setAllInOneConfig(jupiterModel, config.orbitalObjects.jupiter, config.dimensions);
 
-    let europaModel = new SimpleSolidSphere(gl, 40, 40);
+    let ioModel = new SimpleSolidSphere(gl, 15, 15);
+    ioModel.setShaderAttributes(ctx.attributes);
+    ioModel.setShaderUniforms(ctx.uniforms);
+    ioModel.setTexture(ctx.textures.get("Jupiter - Io"));
+    ioModel.enableLighting();
+
+    let ioObject = new OrbitalObject();
+    ioObject.setAllInOneConfig(ioModel, config.orbitalObjects.jupiterIo, config.dimensions);
+
+    let europaModel = new SimpleSolidSphere(gl, 15, 15);
     europaModel.setShaderAttributes(ctx.attributes);
     europaModel.setShaderUniforms(ctx.uniforms);
-    europaModel.setTexture(ctx.textures.get("Europa"));
+    europaModel.setTexture(ctx.textures.get("Jupiter - Europa"));
     europaModel.enableLighting();
 
     let europaObject = new OrbitalObject();
-    europaObject.setAllInOneConfig(europaModel, config.orbitalObjects.europa, config.dimensions);
+    europaObject.setAllInOneConfig(europaModel, config.orbitalObjects.jupiterEuropa, config.dimensions);
 
-    let ganymedeModel = new SimpleSolidSphere(gl, 40, 40);
+    let ganymedeModel = new SimpleSolidSphere(gl, 15, 15);
     ganymedeModel.setShaderAttributes(ctx.attributes);
     ganymedeModel.setShaderUniforms(ctx.uniforms);
-    ganymedeModel.setTexture(ctx.textures.get("Ganymede"));
+    ganymedeModel.setTexture(ctx.textures.get("Jupiter - Ganymede"));
     ganymedeModel.enableLighting();
 
     let ganymedeObject = new OrbitalObject();
-    ganymedeObject.setAllInOneConfig(ganymedeModel, config.orbitalObjects.ganymede, config.dimensions);
+    ganymedeObject.setAllInOneConfig(ganymedeModel, config.orbitalObjects.jupiterGanymede, config.dimensions);
+
+    let callistoModel = new SimpleSolidSphere(gl, 15, 15);
+    callistoModel.setShaderAttributes(ctx.attributes);
+    callistoModel.setShaderUniforms(ctx.uniforms);
+    callistoModel.setTexture(ctx.textures.get("Jupiter - Callisto"));
+    callistoModel.enableLighting();
+
+    let callistoObject = new OrbitalObject();
+    callistoObject.setAllInOneConfig(callistoModel, config.orbitalObjects.jupiterCallisto, config.dimensions);
+
+    let saturnModel = new SimpleSolidSphere(gl, 60, 60);
+    saturnModel.setShaderAttributes(ctx.attributes);
+    saturnModel.setShaderUniforms(ctx.uniforms);
+    saturnModel.setTexture(ctx.textures.get("Saturn"));
+    saturnModel.enableLighting();
+
+    let saturnObject = new OrbitalObject();
+    saturnObject.setAllInOneConfig(saturnModel, config.orbitalObjects.saturn, config.dimensions);
 
 
     sunObject.addChild(mercuryObject);
     sunObject.addChild(venusObject);
     earthObject.addChild(moonObject);
     sunObject.addChild(earthObject);
+    sunObject.addChild(earthCloudsObject);
     sunObject.addChild(marsObject);
     sunObject.addChild(jupiterObject);
     jupiterObject.addChild(europaObject);
     jupiterObject.addChild(ganymedeObject);
+    jupiterObject.addChild(ioObject);
+    jupiterObject.addChild(callistoObject);
+    sunObject.addChild(saturnObject);
 
     ctx.objects.orbitalChain = sunObject;
 }
@@ -241,6 +288,11 @@ function initGL() {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clearDepth(1.0);
     gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.CULL_FACE);
+    gl.frontFace(gl.CCW);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+    //gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+    //gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 }
 
 
@@ -263,6 +315,7 @@ function setUpAttributesAndUniforms(){
     ctx.uniforms.uNormalMatrixId = gl.getUniformLocation(ctx.shaderProgram, 'uNormalMatrix');
     ctx.uniforms.uLightPositionId = gl.getUniformLocation(ctx.shaderProgram, 'uLightPosition');
     ctx.uniforms.uLightColorId = gl.getUniformLocation(ctx.shaderProgram, 'uLightColor');
+    ctx.uniforms.uEnableSpecularId = gl.getUniformLocation(ctx.shaderProgram, 'uEnableSpecular');
 }
 
 
@@ -332,7 +385,6 @@ function refreshScene(deltaTime) {
     if(keyPressManager.isPressed('+')) { cameraViewMatrix.zoomIn(); }
     if(keyPressManager.isPressed('-')) { cameraViewMatrix.zoomOut(); }
 
-    //orbitalObject.refreshModel(deltaTime);
     ctx.objects.orbitalChain.refreshModel(deltaTime);
 }
 
@@ -345,6 +397,7 @@ function drawScene() {
     gl.depthFunc(gl.LEQUAL);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+
     let cameraMatrix = cameraViewMatrix.getMatrix();
 
     disableTextureMode();
@@ -356,7 +409,9 @@ function drawScene() {
 
     // Then draw all orbital objects
     enableTextureMode();
+    gl.frontFace(gl.CW);
     ctx.objects.deepSpaceSphere.draw(gl, cameraMatrix);
+    gl.frontFace(gl.CCW);
     ctx.objects.orbitalChain.draw(gl, cameraMatrix);
 }
 
@@ -373,6 +428,7 @@ function disableTextureMode() {
 
 function enableLighting() {
     gl.uniform1i(ctx.uniforms.uEnableLightingId, 1);
+    gl.uniform1i(ctx.uniforms.uEnableSpecularId, 1);
 }
 
 
