@@ -126,7 +126,8 @@ function startup() {
     lightObject.init(gl);
 
     // CameraMatrix
-    cameraViewMatrix.setPosition(-Math.PI/3, Math.PI/3*2, Math.PI / 5);
+    //cameraViewMatrix.setPosition(-Math.PI/3, Math.PI/3*2, Math.PI / 5);
+    cameraViewMatrix.setPosition(0.0, 0.0, 3.0);
     cameraViewMatrix.setUpDirection(0.0, 0.0, 1.0);
     cameraViewMatrix.setLookAtPosition(0.0, 0.0, 0.0);
     cameraViewMatrix.setDistance(1.0);
@@ -135,7 +136,7 @@ function startup() {
     setUpProjectionMatrix();
 
     // Key-Listener
-    keyPressManager.beginListening('ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '-');
+    keyPressManager.beginListening('ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '-', 'a', 'd');
 
     // Start Animation-Loop
     animationLoop();
@@ -306,8 +307,6 @@ function initGL() {
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.frontFace(gl.CCW);
-    //gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-    //gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 }
 
 
@@ -393,12 +392,14 @@ function animationLoop(currTimeStamp) {
 
 
 function refreshScene(deltaTime) {
-    if(keyPressManager.isPressed('ArrowLeft')) { cameraViewMatrix.rotateLeft(); }
-    if(keyPressManager.isPressed('ArrowRight')) { cameraViewMatrix.rotateRight(); }
-    if(keyPressManager.isPressed('ArrowUp')) { cameraViewMatrix.rotateUp(); }
-    if(keyPressManager.isPressed('ArrowDown')) { cameraViewMatrix.rotateDown(); }
-    if(keyPressManager.isPressed('+')) { cameraViewMatrix.zoomIn(); }
-    if(keyPressManager.isPressed('-')) { cameraViewMatrix.zoomOut(); }
+    //if(keyPressManager.isPressed('ArrowLeft')) { cameraViewMatrix.rotateLeft(); }
+    //if(keyPressManager.isPressed('ArrowRight')) { cameraViewMatrix.rotateRight(); }
+    //if(keyPressManager.isPressed('ArrowUp')) { cameraViewMatrix.rotateUp(); }
+    //if(keyPressManager.isPressed('ArrowDown')) { cameraViewMatrix.rotateDown(); }
+    //if(keyPressManager.isPressed('+')) { cameraViewMatrix.zoomIn(); }
+    //if(keyPressManager.isPressed('-')) { cameraViewMatrix.zoomOut(); }
+    if(keyPressManager.isPressed('a')) { cameraViewMatrix.moveLeft(); }
+    if(keyPressManager.isPressed('d')) { cameraViewMatrix.moveRight(); }
 
     ctx.objects.orbitalChain.refreshModel(deltaTime);
 }
