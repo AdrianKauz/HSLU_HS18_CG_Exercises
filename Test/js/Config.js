@@ -2,7 +2,7 @@ export function Config() {
     this.orbitalObjects = {
         sun : {
             object : {
-                diameter : 31879000, // Real value: 1391016000
+                diameter : 41879000, // Real value: 1391016000
                 orientation : [-Math.PI/2, 0.0, 0.0],
                 rotationVelocity : [0.02, 0.02, 0.02]
             },
@@ -171,8 +171,8 @@ export function Config() {
     };
 
     this.dimensions = {
-        object : 0.00000001,
-        radius : 0.0000000000050,
+        object : 0.000000005,
+        radius : 0.000000000003,
         sydericPeriod : 365.256363004,
         orbitalPeriodSimulation : 300 // Value in Seconds
     }

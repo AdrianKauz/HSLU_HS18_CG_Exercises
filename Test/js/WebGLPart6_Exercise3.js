@@ -129,7 +129,7 @@ function startup() {
     cameraViewMatrix.setPosition(-Math.PI/3, Math.PI/3*2, Math.PI / 5);
     cameraViewMatrix.setUpDirection(0.0, 0.0, 1.0);
     cameraViewMatrix.setLookAtPosition(0.0, 0.0, 0.0);
-    cameraViewMatrix.setDistance(5.0);
+    cameraViewMatrix.setDistance(1.0);
 
     // ProjektionMatrix
     setUpProjectionMatrix();
@@ -271,7 +271,7 @@ function defineOrbitalObjects() {
 
     let saturnRingObject = new OrbitalObject();
     saturnRingObject.setAllInOneConfig(saturnRingModel, config.orbitalObjects.saturnRing, config.dimensions);
-    saturnRingObject.setObjectScaling(4.0, 4.0, 0.0);
+    saturnRingObject.setObjectScaling(2.0, 2.0, 0.0);
 
 
 
