@@ -17,7 +17,7 @@ const float shininess = 20.0;
 const vec3 specularMaterialColor = vec3(0.2, 0.2, 0.2);
 
 void main() {
-    vec4 baseColor = (uEnableTexture) ? texture2D(uSampler, vTextureCoord) : vColor;
+    vec4 baseColor = (uEnableTexture) ? texture2D(uSampler, vTextureCoord, -1.0) : vColor;
 
     if(uEnableLighting) {
         vec3 normal = normalize(vNormal);

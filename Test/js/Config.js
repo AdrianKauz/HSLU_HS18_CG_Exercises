@@ -156,6 +156,18 @@ export function Config() {
                 radius : 1430000000000
             }
         },
+        saturnRing : {
+            object : {
+                diameter : 0.0,
+                orientation : [Math.PI/0.87, 0.0, 0.0],
+                rotationVelocity : [0.0, 0.0, 0.0]
+            },
+            orbit : {
+                velocity : 0.0,
+                inclination : 0.0,
+                radius : 0.0
+            }
+        },
     };
 
     this.dimensions = {

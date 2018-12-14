@@ -1,4 +1,4 @@
-import { PolygonCube } from './PolygonCube.js';
+import { SimplePolygonCube } from './SimplePolygonCube.js';
 import { CartesianObject } from './CartesianObject.js';
 import { rgbToV4 } from '../../js/HelperFunctions.js';
 import { KeyPressManager } from '../../js/KeyPressManager.js';
@@ -92,6 +92,7 @@ function startup() {
     ctx.textures.set("Jupiter - Io", loadTexture(gl, "./img/1k_planet_jupiter_moon_io.jpg"));
     ctx.textures.set("Jupiter - Callisto", loadTexture(gl, "./img/1k_planet_jupiter_moon_callisto.jpg"));
     ctx.textures.set("Saturn", loadTexture(gl, "./img/2k_planet_saturn.jpg"));
+    ctx.textures.set("Saturn - Ring", loadTexture(gl, "./img/2k_saturn_ring.png"));
 
     ctx.textures.set("Earth - Clouds", loadTexture(gl, "./img/1k_planet_earth_clouds.png"));
 
@@ -183,7 +184,7 @@ function defineOrbitalObjects() {
     earthCloudsModel.setShaderUniforms(ctx.uniforms);
     earthCloudsModel.setTexture(ctx.textures.get("Earth - Clouds"));
     earthCloudsModel.enableLighting();
-    earthCloudsModel.enableAlpha();
+    earthCloudsModel.enableAlpha(gl.SRC_ALPHA, gl.ONE);
 
     let earthCloudsObject = new OrbitalObject();
     earthCloudsObject.setAllInOneConfig(earthCloudsModel, config.orbitalObjects.earthClouds, config.dimensions);
@@ -261,6 +262,20 @@ function defineOrbitalObjects() {
     saturnObject.setAllInOneConfig(saturnModel, config.orbitalObjects.saturn, config.dimensions);
 
 
+    let saturnRingModel = new SimplePolygonCube(gl);
+    saturnRingModel.setShaderAttributes(ctx.attributes);
+    saturnRingModel.setShaderUniforms(ctx.uniforms);
+    saturnRingModel.setTexture(ctx.textures.get("Saturn - Ring"));
+    //saturnRingModel.enableLighting();
+    saturnRingModel.enableAlpha(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    let saturnRingObject = new OrbitalObject();
+    saturnRingObject.setAllInOneConfig(saturnRingModel, config.orbitalObjects.saturnRing, config.dimensions);
+    saturnRingObject.setObjectScaling(4.0, 4.0, 0.0);
+
+
+
+
     sunObject.addChild(mercuryObject);
     sunObject.addChild(venusObject);
     earthObject.addChild(moonObject);
@@ -273,6 +288,7 @@ function defineOrbitalObjects() {
     jupiterObject.addChild(ioObject);
     jupiterObject.addChild(callistoObject);
     sunObject.addChild(saturnObject);
+    saturnObject.addChild(saturnRingObject);
 
     ctx.objects.orbitalChain = sunObject;
 }
@@ -290,7 +306,6 @@ function initGL() {
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.frontFace(gl.CCW);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
     //gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
     //gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 }

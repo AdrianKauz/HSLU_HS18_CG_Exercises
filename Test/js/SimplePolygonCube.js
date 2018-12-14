@@ -1,19 +1,6 @@
-import { defineNewBuffer, rgbToV4, rgbaToV4 } from "../../js/HelperFunctions.js";
+import {flattenArray2D, rgbToV4, rgbaToV4, stretchArray, defineNewBuffer} from "../../js/HelperFunctions.js";
 
-/**
- *
- * Define a sphere that can be drawn with a color
- */
-
-/**
- *
- * @param gl the gl object for which to define the sphere
- * @param latitudeBands the number of bands along the latitude direction
- * @param longitudeBands the number of bands along the longitude direction
- *
- */
-export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
-    "use strict";
+export function SimplePolygonCube(gl) {
     const ctx = {
         attributes : {
             aVertexPositionId : -1,
@@ -29,24 +16,18 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
             uEnableLightingId : -1,
             uEnableSpecularId : -1
         },
-        latitudeBands : newLatitudeBands,
-        longitudeBands : newLongitudeBands,
         buffer : {
             vertices : -1,
             indices : -1,
-            normals : -1,
-            textures : -1
+            colors : -1,
+            textures : -1,
+            normals : -1
         },
         matrices : {
             model : null,
             view : null,
             normal : null
         },
-        triangleCounter : 0,
-        vertices : [],
-        normals : [],
-        indices : [],
-        textures : [],
         color : [255, 0, 0],
         texture : null,
         isLighted : false,
@@ -57,16 +38,117 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         }
     };
 
-    // Generate Vertices, Indices, Normals and Texturecoords
-    defineVerticesAndTexture(ctx.latitudeBands, ctx.longitudeBands);
-    defineIndices(ctx.latitudeBands, ctx.longitudeBands);
-    ctx.triangleCounter = ctx.latitudeBands * ctx.longitudeBands * 2;
+    const vertices = [
+        // Front Side
+        -0.5, -0.5,  0.5, // 00
+         0.5, -0.5,  0.5, // 01
+         0.5,  0.5,  0.5, // 02
+        -0.5,  0.5,  0.5, // 03
+
+        // Back Side
+        -0.5, -0.5, -0.5, // 04
+        -0.5,  0.5, -0.5, // 05
+         0.5,  0.5, -0.5, // 06
+         0.5, -0.5, -0.5, // 07
+
+        // Top Side
+        -0.5,  0.5, -0.5, // 08
+        -0.5,  0.5,  0.5, // 09
+         0.5,  0.5,  0.5, // 10
+         0.5,  0.5, -0.5, // 11
+
+        // Bottom Side
+        -0.5, -0.5, -0.5, // 12
+         0.5, -0.5, -0.5, // 13
+         0.5, -0.5,  0.5, // 14
+        -0.5, -0.5,  0.5, // 15
+
+        // Right Side
+         0.5, -0.5, -0.5, // 16
+         0.5,  0.5, -0.5, // 17
+         0.5,  0.5,  0.5, // 18
+         0.5, -0.5,  0.5, // 19
+
+        // Left Side
+        -0.5, -0.5, -0.5, // 20
+        -0.5, -0.5,  0.5, // 21
+        -0.5,  0.5,  0.5, // 22
+        -0.5,  0.5, -0.5  // 23
+    ];
+
+
+    const textureCoordinates = [
+        // Front Side
+        1.0,  1.0,
+        0.0,  1.0,
+        0.0,  0.0,
+        1.0,  0.0,
+
+        // Back Side
+        0.0,  0.0,
+        1.0,  0.0,
+        1.0,  1.0,
+        0.0,  1.0,
+
+        // Top Side
+        0.0,  0.0,
+        1.0,  0.0,
+        1.0,  1.0,
+        0.0,  1.0,
+
+        // Bottom Side (Mirrored)
+        1.0,  0.0,
+        0.0,  0.0,
+        0.0,  1.0,
+        1.0,  1.0,
+
+        // Right Side
+        0.0,  0.0,
+        1.0,  0.0,
+        1.0,  1.0,
+        0.0,  1.0,
+
+        // Left Side (Mirrored)
+        0.0,  1.0,
+        1.0,  1.0,
+        1.0,  0.0,
+        0.0,  0.0
+    ];
+
+    let colors = [
+        rgbToV4(255,  80,  14), // Front Side
+        rgbToV4(255,  80,  14), // Back Side
+        rgbToV4(255,  20,  20), // Top Side
+        rgbToV4(255,  20,  20), // Bottom Side
+        rgbToV4(230, 153,  15), // Right Side
+        rgbToV4(230, 153,  15)  // Left Side
+    ];
+
+    const normals = [
+        [ 0.0,  0.0,  1.0], // Front Side Normal
+        [ 0.0,  0.0, -1.0], // Back Side Normal
+        [ 0.0,  1.0,  0.0], // Top Side Normal
+        [ 0.0, -1.0,  0.0], // Bottom Side Normal
+        [ 1.0,  0.0,  0.0], // Right Side Normal
+        [-1.0,  0.0,  0.0]  // Left Side Normal
+    ];
+
+    const indices = [
+        0,  1,  2,   0,  2,  3, // Front
+        4,  5,  6,   4,  6,  7, // Back
+        8,  9, 10,   8, 10, 11, // Top
+       12, 13, 14,  12, 14, 15, // Bottom
+       16, 17, 18,  16, 18, 19, // Right
+       20, 21, 22,  20, 22, 23  // Left
+    ];
+
 
     // Set Buffers
-    ctx.buffer.vertices = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(ctx.vertices), gl.STATIC_DRAW);
-    ctx.buffer.normals = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(ctx.normals), gl.STATIC_DRAW);
-    ctx.buffer.textures = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(ctx.textures), gl.STATIC_DRAW);
-    ctx.buffer.indices = defineNewBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(ctx.indices), gl.STATIC_DRAW);
+    ctx.buffer.vertices = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    ctx.buffer.indices = defineNewBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+    ctx.buffer.colors = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(flattenArray2D(stretchArray(colors, 4))), gl.STATIC_DRAW);
+    ctx.buffer.textures = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
+    ctx.buffer.normals = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(flattenArray2D(stretchArray(normals, 4))), gl.STATIC_DRAW);
 
 
     this.setShaderAttributes = function(newAttributes) {
@@ -124,14 +206,14 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         gl.uniformMatrix4fv(ctx.uniforms.uModelMatrixId, false, ctx.matrices.model);
         gl.uniformMatrix3fv(ctx.uniforms.uNormalMatrixId, false, ctx.matrices.normal);
 
-        // position
+        // Vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.vertices);
         gl.enableVertexAttribArray(ctx.attributes.aVertexPositionId);
         gl.vertexAttribPointer(ctx.attributes.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
 
         if(ctx.texture != null) {
             // Texture
-            gl.uniform1i(ctx.uniforms.uSampler, 1);
+            gl.uniform1i(ctx.uniforms.uSampler, 0);
             gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.textures);
             gl.enableVertexAttribArray(ctx.attributes.aTextureCoordId);
             gl.vertexAttribPointer(ctx.attributes.aTextureCoordId, 2, gl.FLOAT, false, 0, 0);
@@ -139,36 +221,37 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, ctx.texture);
 
-            gl.vertexAttrib4fv(ctx.aVertexColorId, rgbaToV4(0, 0, 0, 0.0));
+            gl.vertexAttrib4fv(ctx.attributes.aVertexColorId, rgbaToV4(0, 0, 0, 0.0));
         }
         else {
             // Colors
-            gl.disableVertexAttribArray(ctx.attributes.aVertexColorId);
-            gl.vertexAttrib4fv(ctx.attributes.aVertexColorId, rgbToV4(ctx.color[0], ctx.color[1], ctx.color[2]));
+            gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.colors);
+            gl.enableVertexAttribArray(ctx.attributes.aVertexColorId);
+            gl.vertexAttribPointer(ctx.attributes.aVertexColorId, 4, gl.FLOAT, false, 0, 0);
         }
 
-        // normal
+        // Normals
         gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.normals);
         gl.enableVertexAttribArray(ctx.attributes.aVertexNormalId);
         gl.vertexAttribPointer(ctx.attributes.aVertexNormalId, 3, gl.FLOAT, false, 0, 0);
 
-        // model reacts with lighting
+        // Model reacts with lighting
         if(ctx.isLighted) {
             gl.uniform1i(ctx.uniforms.uEnableLightingId, 1);
         }
 
-        // transparency
+        // Transparency
         if(ctx.alpha.enable) {
             gl.enable(gl.BLEND);
             gl.blendFunc(ctx.alpha.sfactor, ctx.alpha.dfactor);
             gl.uniform1i(ctx.uniforms.uEnableSpecularId, 0);
         }
 
-        // elements
+        // Indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ctx.buffer.indices);
-        gl.drawElements(gl.TRIANGLES, ctx.triangleCounter * 3 ,gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
-        // disable the arrays, alpha, lighting
+        // Disable the arrays, alpha, lighting
         if(ctx.texture != null) {
             gl.disableVertexAttribArray(ctx.attributes.aTextureCoordId);
         }
@@ -178,79 +261,11 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         }
 
         gl.disableVertexAttribArray(ctx.attributes.aVertexPositionId);
-        gl.disableVertexAttribArray(ctx.attributes.aVertexNormalId);
         gl.disableVertexAttribArray(ctx.attributes.aVertexColorId);
+        gl.disableVertexAttribArray(ctx.attributes.aVertexNormalId);
         gl.uniform1i(ctx.uniforms.uEnableLightingId, 0);
         gl.uniform1i(ctx.uniforms.uEnableSpecularId, 1);
     };
-
-
-    function defineVerticesAndTexture(latitudeBands, longitudeBands) {
-        "use strict";
-        // define the vertices of the sphere
-        let vertices = [];
-        let normals = [];
-        let textures = [];
-
-        for (let latNumber = 0; latNumber <= latitudeBands; latNumber++) {
-            let theta = latNumber * Math.PI / latitudeBands;
-            let sinTheta = Math.sin(theta);
-            let cosTheta = Math.cos(theta);
-
-            for (let longNumber = 0; longNumber <= longitudeBands; longNumber++) {
-                let phi = longNumber * 2 * Math.PI / longitudeBands;
-                let sinPhi = Math.sin(phi);
-                let cosPhi = Math.cos(phi);
-
-                // position (and normals as it is a unit sphere)
-                let x = cosPhi * sinTheta;
-                let y = cosTheta;
-                let z = sinPhi * sinTheta;
-
-                // texture coordinates
-                let u = 1 - (longNumber / longitudeBands);
-                let v = 1 - (latNumber / latitudeBands);
-
-                vertices.push(x);
-                vertices.push(y);
-                vertices.push(z);
-
-                normals.push(x);
-                normals.push(y);
-                normals.push(z);
-
-                textures.push(u);
-                textures.push(v);
-            }
-        }
-
-        ctx.vertices = vertices;
-        ctx.normals = normals;
-        ctx.textures = textures;
-    }
-
-
-    function defineIndices(latitudeBands, longitudeBands) {
-        "use strict";
-        let indices = [];
-
-        for (let latNumber = 0; latNumber < latitudeBands; latNumber++) {
-            for (let longNumber = 0; longNumber < longitudeBands; longNumber++) {
-                let first = (latNumber * (longitudeBands + 1)) + longNumber;
-                let second = first + longitudeBands + 1;
-
-                indices.push(first);
-                indices.push(first + 1);
-                indices.push(second);
-
-                indices.push(second);
-                indices.push(first + 1);
-                indices.push(second + 1);
-            }
-        }
-
-        ctx.indices = indices;
-    }
 
 
     function refreshNormalMatrix() {
