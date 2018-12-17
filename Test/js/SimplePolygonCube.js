@@ -14,7 +14,8 @@ export function SimplePolygonCube(gl) {
             uNormalMatrixId : -1,
             uSamplerId : -1,
             uEnableLightingId : -1,
-            uEnableSpecularId : -1
+            uEnableSpecularId : -1,
+            uEnableTextureId : -1
         },
         buffer : {
             vertices : -1,
@@ -79,10 +80,10 @@ export function SimplePolygonCube(gl) {
 
     const textureCoordinates = [
         // Front Side
-        1.0,  1.0,
-        0.0,  1.0,
-        0.0,  0.0,
-        1.0,  0.0,
+        1.0, 0.0,
+        1.0, 1.0,
+        0.0, 1.0,
+        0.0, 0.0,
 
         // Back Side
         0.0,  0.0,
@@ -96,11 +97,11 @@ export function SimplePolygonCube(gl) {
         1.0,  1.0,
         0.0,  1.0,
 
-        // Bottom Side (Mirrored)
-        1.0,  0.0,
+        // Bottom Side
         0.0,  0.0,
-        0.0,  1.0,
+        1.0,  0.0,
         1.0,  1.0,
+        0.0,  1.0,
 
         // Right Side
         0.0,  0.0,
@@ -109,19 +110,19 @@ export function SimplePolygonCube(gl) {
         0.0,  1.0,
 
         // Left Side (Mirrored)
-        0.0,  1.0,
-        1.0,  1.0,
+        0.0,  0.0,
         1.0,  0.0,
-        0.0,  0.0
+        1.0,  1.0,
+        0.0,  1.0,
     ];
 
     let colors = [
-        rgbToV4(255,  80,  14), // Front Side
-        rgbToV4(255,  80,  14), // Back Side
-        rgbToV4(255,  20,  20), // Top Side
-        rgbToV4(255,  20,  20), // Bottom Side
-        rgbToV4(230, 153,  15), // Right Side
-        rgbToV4(230, 153,  15)  // Left Side
+        rgbToV4(0, 0, 0), // Front Side
+        rgbToV4(0, 0, 0), // Back Side
+        rgbToV4(0, 0, 0), // Top Side
+        rgbToV4(0, 0, 0), // Bottom Side
+        rgbToV4(0, 0, 0), // Right Side
+        rgbToV4(0, 0, 0)  // Left Side
     ];
 
     const normals = [
@@ -166,11 +167,17 @@ export function SimplePolygonCube(gl) {
         ctx.uniforms.uSamplerId = newUniforms.uSamplerId;
         ctx.uniforms.uEnableLightingId = newUniforms.uEnableLightingId;
         ctx.uniforms.uEnableSpecularId = newUniforms.uEnableSpecularId;
+        ctx.uniforms.uEnableTextureId = newUniforms.uEnableTextureId;
     };
 
 
     this.setTexture = function(newTexture) {
         ctx.texture = newTexture;
+    };
+
+
+    this.setColor = function(newRed, newGreen, newBlue) {
+        ctx.color = [newRed, newGreen, newBlue];
     };
 
 
@@ -213,6 +220,7 @@ export function SimplePolygonCube(gl) {
 
         if(ctx.texture != null) {
             // Texture
+            gl.uniform1i(ctx.uniforms.uEnableTextureId, 1);
             gl.uniform1i(ctx.uniforms.uSampler, 0);
             gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.textures);
             gl.enableVertexAttribArray(ctx.attributes.aTextureCoordId);
@@ -225,6 +233,7 @@ export function SimplePolygonCube(gl) {
         }
         else {
             // Colors
+            gl.uniform1i(ctx.uniforms.uEnableTextureId, 0);
             gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.colors);
             gl.enableVertexAttribArray(ctx.attributes.aVertexColorId);
             gl.vertexAttribPointer(ctx.attributes.aVertexColorId, 4, gl.FLOAT, false, 0, 0);

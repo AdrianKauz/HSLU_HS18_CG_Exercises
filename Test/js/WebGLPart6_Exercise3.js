@@ -74,6 +74,7 @@ function startup() {
     ctx.canvas.height = canvas.height;
     ctx.canvas.width = canvas.width;
     ctx.canvas.ratio = ctx.canvas.width / ctx.canvas.height;
+
     gl = createGLContext(canvas);
 
     initGL();
@@ -92,7 +93,7 @@ function startup() {
     ctx.textures.set("Jupiter - Io", loadTexture(gl, "./img/1k_planet_jupiter_moon_io.jpg"));
     ctx.textures.set("Jupiter - Callisto", loadTexture(gl, "./img/1k_planet_jupiter_moon_callisto.jpg"));
     ctx.textures.set("Saturn", loadTexture(gl, "./img/2k_planet_saturn.jpg"));
-    ctx.textures.set("Saturn - Ring", loadTexture(gl, "./img/2k_saturn_ring.png"));
+    ctx.textures.set("Saturn - Ring", loadTexture(gl, "./img/2k_planet_saturn_ring.png"));
 
     ctx.textures.set("Earth - Clouds", loadTexture(gl, "./img/1k_planet_earth_clouds.png"));
 
@@ -127,20 +128,101 @@ function startup() {
 
     // CameraMatrix
     //cameraViewMatrix.setPosition(-Math.PI/3, Math.PI/3*2, Math.PI / 5);
-    cameraViewMatrix.setPosition(0.0, 0.0, 3.0);
-    cameraViewMatrix.setUpDirection(0.0, 0.0, 1.0);
-    cameraViewMatrix.setLookAtPosition(0.0, 0.0, 0.0);
+    //cameraViewMatrix.setPosition(0.0, 0.0, 3.0);
+    //cameraViewMatrix.setUpDirection(0.0, 0.0, 1.0);
+    //cameraViewMatrix.setLookAtPosition(0.0, 0.0, 0.0);
     cameraViewMatrix.setDistance(1.0);
 
     // ProjektionMatrix
     setUpProjectionMatrix();
 
     // Key-Listener
-    keyPressManager.beginListening('ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '-', 'a', 'd');
+    keyPressManager.beginListening('ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '-', 'a', 'd', 'w', 's');
+
+/*
+
+// pointer lock object forking for cross browser
+
+    canvas.requestPointerLock = canvas.requestPointerLock ||
+        canvas.mozRequestPointerLock;
+
+    document.exitPointerLock = document.exitPointerLock ||
+        document.mozExitPointerLock;
+
+    canvas.onclick = function() {
+        canvas.requestPointerLock();
+    };
+
+// pointer lock event listeners
+
+// Hook pointer lock state change events for different browsers
+    document.addEventListener('pointerlockchange', lockChangeAlert, false);
+    document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
+
+    function lockChangeAlert() {
+        if (document.pointerLockElement === canvas ||
+            document.mozPointerLockElement === canvas) {
+            console.log('The pointer lock status is now locked');
+            document.addEventListener("mousemove", updatePosition, false);
+        } else {
+            console.log('The pointer lock status is now unlocked');
+            document.removeEventListener("mousemove", updatePosition, false);
+        }
+    }
+*/
 
     // Start Animation-Loop
     animationLoop();
 }
+
+
+
+
+
+
+
+
+/*
+function updatePosition(e) {
+    //console.log(e);
+    if(e.movementX > 0) {
+        //cameraViewMatrix.moveRight()
+    }
+    else {
+        cameraViewMatrix.rotateLeft()
+    }
+
+    if(e.movementY > 0) {
+        //cameraViewMatrix.moveBackward()
+    }
+    else {
+        //cameraViewMatrix.moveForward()
+    }
+
+
+}
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 function defineOrbitalObjects() {
@@ -217,6 +299,15 @@ function defineOrbitalObjects() {
     let jupiterObject = new OrbitalObject();
     jupiterObject.setAllInOneConfig(jupiterModel, config.orbitalObjects.jupiter, config.dimensions);
 
+    let monolithModel = new SimplePolygonCube(gl);
+    monolithModel.setShaderAttributes(ctx.attributes);
+    monolithModel.setShaderUniforms(ctx.uniforms);
+    monolithModel.enableLighting();
+
+    let monolithObject = new OrbitalObject();
+    monolithObject.setAllInOneConfig(monolithModel, config.orbitalObjects.jupiterMonolith, config.dimensions);
+    monolithObject.setObjectScaling(0.01, 0.04, 0.09);
+
     let ioModel = new SimpleSolidSphere(gl, 15, 15);
     ioModel.setShaderAttributes(ctx.attributes);
     ioModel.setShaderUniforms(ctx.uniforms);
@@ -262,7 +353,6 @@ function defineOrbitalObjects() {
     let saturnObject = new OrbitalObject();
     saturnObject.setAllInOneConfig(saturnModel, config.orbitalObjects.saturn, config.dimensions);
 
-
     let saturnRingModel = new SimplePolygonCube(gl);
     saturnRingModel.setShaderAttributes(ctx.attributes);
     saturnRingModel.setShaderUniforms(ctx.uniforms);
@@ -288,6 +378,7 @@ function defineOrbitalObjects() {
     jupiterObject.addChild(ganymedeObject);
     jupiterObject.addChild(ioObject);
     jupiterObject.addChild(callistoObject);
+    jupiterObject.addChild(monolithObject);
     sunObject.addChild(saturnObject);
     saturnObject.addChild(saturnRingObject);
 
@@ -392,12 +483,12 @@ function animationLoop(currTimeStamp) {
 
 
 function refreshScene(deltaTime) {
-    //if(keyPressManager.isPressed('ArrowLeft')) { cameraViewMatrix.rotateLeft(); }
-    //if(keyPressManager.isPressed('ArrowRight')) { cameraViewMatrix.rotateRight(); }
-    //if(keyPressManager.isPressed('ArrowUp')) { cameraViewMatrix.rotateUp(); }
-    //if(keyPressManager.isPressed('ArrowDown')) { cameraViewMatrix.rotateDown(); }
-    //if(keyPressManager.isPressed('+')) { cameraViewMatrix.zoomIn(); }
-    //if(keyPressManager.isPressed('-')) { cameraViewMatrix.zoomOut(); }
+    if(keyPressManager.isPressed('ArrowLeft')) { cameraViewMatrix.rotateLeft(); }
+    if(keyPressManager.isPressed('ArrowRight')) { cameraViewMatrix.rotateRight(); }
+    if(keyPressManager.isPressed('ArrowUp')) { cameraViewMatrix.rotateDown(); }
+    if(keyPressManager.isPressed('ArrowDown')) { cameraViewMatrix.rotateUp(); }
+    if(keyPressManager.isPressed('w')) { cameraViewMatrix.moveForward(); }
+    if(keyPressManager.isPressed('s')) { cameraViewMatrix.moveBackward(); }
     if(keyPressManager.isPressed('a')) { cameraViewMatrix.moveLeft(); }
     if(keyPressManager.isPressed('d')) { cameraViewMatrix.moveRight(); }
 

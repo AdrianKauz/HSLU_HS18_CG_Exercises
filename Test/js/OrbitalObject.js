@@ -128,7 +128,7 @@ export function OrbitalObject() {
 
         // Tilt orbit around Y-Axis
         if(ctx.orbital.inclination !== 0.0) {
-            mat4.rotateY(ctx.matrix, ctx.matrix, (ctx.orbital.inclination * Math.PI / 180));
+            mat4.rotateX(ctx.matrix, ctx.matrix, (ctx.orbital.inclination * Math.PI / 180));
         }
 
         // Rotate object around Z-Axis
@@ -136,7 +136,7 @@ export function OrbitalObject() {
             ctx.orbital.orientation += (ctx.orbital.velocity / 1000) * deltaTime;
             ctx.orbital.orientation = ctx.orbital.orientation % (2 * Math.PI);
 
-            mat4.rotateZ(ctx.matrix, ctx.matrix, ctx.orbital.orientation);
+            mat4.rotateY(ctx.matrix, ctx.matrix, ctx.orbital.orientation);
         }
 
         // Set Radius around origin
@@ -152,21 +152,21 @@ export function OrbitalObject() {
             ctx.object.currOrientation[0] += (ctx.object.rotationVelocity[0] / 1000) * deltaTime;
             ctx.object.currOrientation[0] = ctx.object.currOrientation[0] % (2 * Math.PI);
 
-            mat4.rotateX(ctx.matrix, ctx.matrix, ctx.object.currOrientation[0]);
+            mat4.rotateY(ctx.matrix, ctx.matrix, ctx.object.currOrientation[0]);
         }
 
         if(ctx.object.rotationVelocity[1] !== 0.0) {
             ctx.object.currOrientation[1] += (ctx.object.rotationVelocity[1] / 1000) * deltaTime;
             ctx.object.currOrientation[1] = ctx.object.currOrientation[1] % (2 * Math.PI);
 
-            mat4.rotateY(ctx.matrix, ctx.matrix, ctx.object.currOrientation[1]);
+            mat4.rotateX(ctx.matrix, ctx.matrix, ctx.object.currOrientation[1]);
         }
 
         if(ctx.object.rotationVelocity[2] !== 0.0) {
             ctx.object.currOrientation[2] += (ctx.object.rotationVelocity[2] / 1000) * deltaTime;
             ctx.object.currOrientation[2] = ctx.object.currOrientation[2] % (2 * Math.PI);
 
-            mat4.rotateZ(ctx.matrix, ctx.matrix, ctx.object.currOrientation[2]);
+            mat4.rotateY(ctx.matrix, ctx.matrix, ctx.object.currOrientation[2]);
         }
 
 

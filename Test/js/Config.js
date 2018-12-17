@@ -3,7 +3,7 @@ export function Config() {
         sun : {
             object : {
                 diameter : 41879000, // Real value: 1391016000
-                orientation : [-Math.PI/2, 0.0, 0.0],
+                orientation : [Math.PI, 0.0, 0.0],
                 rotationVelocity : [0.02, 0.02, 0.02]
             },
             orbit : {
@@ -15,8 +15,8 @@ export function Config() {
         mercury : {
             object : {
                 diameter : 4879000,
-                orientation : [-Math.PI/2, 0.0, 0.0],
-                rotationVelocity : [0.0, 0.2, 0.0]
+                orientation : [Math.PI/1.1, 0.0, 0.0],
+                rotationVelocity : [0.3, 0.0, 0.0]
             },
             orbit : {
                 velocity : 115.88,
@@ -27,8 +27,8 @@ export function Config() {
         venus : {
             object : {
                 diameter : 12104000,
-                orientation : [-Math.PI/2, 0.0, 0.0],
-                rotationVelocity : [0.0, 0.2, 0.0]
+                orientation : [Math.PI/1.1, 0.0, 0.0],
+                rotationVelocity : [0.05, 0.0, 0.0]
             },
             orbit : {
                 velocity : 583.92,
@@ -39,8 +39,8 @@ export function Config() {
         earth : {
             object : {
                 diameter : 12742000,
-                orientation : [-Math.PI/1.9, 0.0, 0.0],
-                rotationVelocity : [0.0, 0.2, 0.0]
+                orientation : [Math.PI/1.1, 0.0, 0.0],
+                rotationVelocity : [0.2, 0.0, 0.0]
             },
             orbit : {
                 velocity : 365.256363004,
@@ -51,8 +51,8 @@ export function Config() {
         earthClouds : {
             object : {
                 diameter : 12937000,
-                orientation : [-Math.PI/1.9, 0.0, 0.0],
-                rotationVelocity : [0.0, 0.15, 0.0]
+                orientation : [Math.PI/1.1, 0.0, 0.0],
+                rotationVelocity : [0.15, 0.0, 0.0]
             },
             orbit : {
                 velocity : 365.256363004,
@@ -63,8 +63,8 @@ export function Config() {
         moon : {
             object : {
                 diameter : 3474000,
-                orientation : [-Math.PI/1.9, 0.0, 0.0],
-                rotationVelocity : [0.0, 0.2, 0.0]
+                orientation : [Math.PI/1.1, Math.PI, 0.0],
+                rotationVelocity : [0.2, 0.0, 0.0]
             },
             orbit : {
                 velocity : 27.322,
@@ -75,8 +75,8 @@ export function Config() {
         mars : {
             object : {
                 diameter : 6779000,
-                orientation : [-Math.PI/1.9, 0.0, 0.0],
-                rotationVelocity : [0.0, 0.2, 0.0]
+                orientation : [Math.PI/1.1, 0.0, 0.0],
+                rotationVelocity : [0.3, 0.0, 0.0]
             },
             orbit : {
                 velocity : 686.980,
@@ -94,6 +94,18 @@ export function Config() {
                 velocity : 4698.076356048,
                 inclination : 1.305,
                 radius : 778500000000
+            }
+        },
+        jupiterMonolith : {
+            object : {
+                diameter : 0.0,
+                orientation : [Math.PI/2, Math.PI/3, 0.0],
+                rotationVelocity : [0.0, 0.0, 0.1]
+            },
+            orbit : {
+                velocity : 40.076356048,
+                inclination : 185.0,
+                radius : 200900000000
             }
         },
         jupiterIo : {

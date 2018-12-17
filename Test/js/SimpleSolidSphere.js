@@ -27,7 +27,8 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
             uNormalMatrixId : -1,
             uSamplerId : -1,
             uEnableLightingId : -1,
-            uEnableSpecularId : -1
+            uEnableSpecularId : -1,
+            uEnableTextureId : -1
         },
         latitudeBands : newLatitudeBands,
         longitudeBands : newLongitudeBands,
@@ -84,6 +85,7 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         ctx.uniforms.uSamplerId = newUniforms.uSamplerId;
         ctx.uniforms.uEnableLightingId = newUniforms.uEnableLightingId;
         ctx.uniforms.uEnableSpecularId = newUniforms.uEnableSpecularId;
+        ctx.uniforms.uEnableTextureId = newUniforms.uEnableTextureId;
     };
 
 
@@ -131,6 +133,7 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
 
         if(ctx.texture != null) {
             // Texture
+            gl.uniform1i(ctx.uniforms.uEnableTextureId, 1);
             gl.uniform1i(ctx.uniforms.uSampler, 1);
             gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.textures);
             gl.enableVertexAttribArray(ctx.attributes.aTextureCoordId);
@@ -143,6 +146,7 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         }
         else {
             // Colors
+            gl.uniform1i(ctx.uniforms.uEnableTextureId, 0);
             gl.disableVertexAttribArray(ctx.attributes.aVertexColorId);
             gl.vertexAttrib4fv(ctx.attributes.aVertexColorId, rgbToV4(ctx.color[0], ctx.color[1], ctx.color[2]));
         }
@@ -171,6 +175,7 @@ export function SimpleSolidSphere(gl, newLatitudeBands, newLongitudeBands) {
         // disable the arrays, alpha, lighting
         if(ctx.texture != null) {
             gl.disableVertexAttribArray(ctx.attributes.aTextureCoordId);
+            gl.uniform1i(ctx.uniforms.uEnableTextureId, 0);
         }
 
         if(ctx.alpha.enable) {
