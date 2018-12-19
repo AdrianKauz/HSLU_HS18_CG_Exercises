@@ -8,13 +8,13 @@ import { SimpleSolidSphere } from './SimpleSolidSphere.js';
 import { LightObject } from './LightObject.js';
 import { OrbitalObject } from './OrbitalObject.js';
 import { Config } from './Config.js';
+import { MouseManager } from './MouseManager.js';
 
 // Register function to call after document has loaded
 window.onload = startup;
 
 // Globals
 let gl = null;
-let smallSolidSphere = null;
 let cartesianObject = null;
 let lightObject = null;
 let orbitalObject = null;
@@ -24,6 +24,7 @@ let canvasHeight = 0;
 let canvasWidth = 0;
 const keyPressManager = new KeyPressManager();
 const cameraViewMatrix = new CameraViewMatrix();
+let mouseManager = null;
 
 const config = new Config();
 
@@ -58,10 +59,13 @@ const ctx = {
         ratio : 0
     },
     timeStamp : null,
-    textures : new Map()
+    textures : new Map(),
+    debug : {
+        cameraPitch : null,
+        cameraYaw : null
+    }
 };
 
-let texBuffer = [1];
 
 /**
  * Startup function to be called when the body is loaded
@@ -69,11 +73,18 @@ let texBuffer = [1];
 function startup() {
     "use strict";
     const canvas = document.getElementById("myCanvas");
+    mouseManager = new MouseManager(canvas);
     canvas.height = window.innerHeight;
     canvas.width = window.innerWidth;
     ctx.canvas.height = canvas.height;
     ctx.canvas.width = canvas.width;
     ctx.canvas.ratio = ctx.canvas.width / ctx.canvas.height;
+
+
+
+    ctx.debug.cameraPitch = document.getElementById("cameraPitch");
+    ctx.debug.cameraYaw = document.getElementById("cameraYaw");
+
 
     gl = createGLContext(canvas);
 
@@ -139,89 +150,9 @@ function startup() {
     // Key-Listener
     keyPressManager.beginListening('ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '+', '-', 'a', 'd', 'w', 's');
 
-/*
-
-// pointer lock object forking for cross browser
-
-    canvas.requestPointerLock = canvas.requestPointerLock ||
-        canvas.mozRequestPointerLock;
-
-    document.exitPointerLock = document.exitPointerLock ||
-        document.mozExitPointerLock;
-
-    canvas.onclick = function() {
-        canvas.requestPointerLock();
-    };
-
-// pointer lock event listeners
-
-// Hook pointer lock state change events for different browsers
-    document.addEventListener('pointerlockchange', lockChangeAlert, false);
-    document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
-
-    function lockChangeAlert() {
-        if (document.pointerLockElement === canvas ||
-            document.mozPointerLockElement === canvas) {
-            console.log('The pointer lock status is now locked');
-            document.addEventListener("mousemove", updatePosition, false);
-        } else {
-            console.log('The pointer lock status is now unlocked');
-            document.removeEventListener("mousemove", updatePosition, false);
-        }
-    }
-*/
-
     // Start Animation-Loop
     animationLoop();
 }
-
-
-
-
-
-
-
-
-/*
-function updatePosition(e) {
-    //console.log(e);
-    if(e.movementX > 0) {
-        //cameraViewMatrix.moveRight()
-    }
-    else {
-        cameraViewMatrix.rotateLeft()
-    }
-
-    if(e.movementY > 0) {
-        //cameraViewMatrix.moveBackward()
-    }
-    else {
-        //cameraViewMatrix.moveForward()
-    }
-
-
-}
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -473,6 +404,7 @@ function animationLoop(currTimeStamp) {
     }
     else {
         refreshScene(currTimeStamp - ctx.timeStamp);
+        refreshDebugInfos();
         drawScene();
 
         ctx.timeStamp = currTimeStamp;
@@ -483,6 +415,7 @@ function animationLoop(currTimeStamp) {
 
 
 function refreshScene(deltaTime) {
+    cameraViewMatrix.rotateWithMouse(mouseManager.getMovement());
     if(keyPressManager.isPressed('ArrowLeft')) { cameraViewMatrix.rotateLeft(); }
     if(keyPressManager.isPressed('ArrowRight')) { cameraViewMatrix.rotateRight(); }
     if(keyPressManager.isPressed('ArrowUp')) { cameraViewMatrix.rotateDown(); }
@@ -493,6 +426,13 @@ function refreshScene(deltaTime) {
     if(keyPressManager.isPressed('d')) { cameraViewMatrix.moveRight(); }
 
     ctx.objects.orbitalChain.refreshModel(deltaTime);
+}
+
+
+function refreshDebugInfos() {
+    let cameraDebugInfos = cameraViewMatrix.getCurrentCameraInfos();
+    ctx.debug.cameraPitch.innerText = cameraDebugInfos.pitch.toFixed(2) + '°';
+    ctx.debug.cameraYaw.innerText = cameraDebugInfos.yaw.toFixed(2) + '°';
 }
 
 

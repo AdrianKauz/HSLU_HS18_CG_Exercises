@@ -36,6 +36,19 @@ html, body {
     text-align: center;
 }
 
+.debugInfo {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: rgb(255, 255, 255);
+    text-shadow: 2px 2px 3px rgb(0, 0, 0);
+    margin-top: 100px;
+    position: absolute;
+    width: 200px;
+    border: 1px solid red;
+}
+
+
 .key {
     width: 20px;
     height: 20px;

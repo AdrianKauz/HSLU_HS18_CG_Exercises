@@ -15,23 +15,19 @@ export function CameraViewMatrix() {
             horizontal : [0.0, 0.0, 0.0],
             vertical : [0.0, 0.0, 0.0],
             yaw : 0.0,
-            pitch : 0.0,
-            stepSize : 0.01
+            pitch : 0.0
         },
-        yaw : -90.0,
+        speed : {
+            mouse : 0.001,
+            keypress : 0.01
+        },
+        yaw : 270.0,
         pitch : 0.0
     };
 
-    let currentMatrix = null;
     let distance = 1.0;
-    let currentPosition = [1.0, 1.0, 0.60];
-    let lookAtPosition = [0.0, 0.0, 0.0];
-    let up = [0.0, 0.0, 1.0];
-    const stepSizeZoom = 0.01;
-    const stepSizeRotation = 0.01;
 
-
-    ctx.vectors.cameraPos = [0.0, 0.0, 3.0];
+    ctx.vectors.cameraPos = [0.0, 0.0, 1.0];
     ctx.vectors.cameraFront = [0.0, 0.0, -1.0];
     ctx.vectors.cameraUp = [0.0, 1.0, 0.0];
 
@@ -39,82 +35,32 @@ export function CameraViewMatrix() {
 
     this.getMatrix = function() {
         return ctx.matrix;
-    }
-
-/*
-    this.setUpDirection = function(newXDirection, newYDirection, newZDirection) {
-        up = [newXDirection, newYDirection, newZDirection];
-
-        refreshMatrix();
     };
 
 
-    this.setPosition = function(newXPosition, newYPosition, newZPosition) {
-        currentPosition = [newXPosition, newYPosition, newZPosition];
-
-        refreshMatrix();
+    this.getCurrentCameraInfos = function() {
+      return {
+          position : ctx.vectors.cameraPos,
+          yaw : ctx.yaw,
+          pitch : ctx.pitch
+      }
     };
 
 
-    this.setLookAtPosition = function(newXPosition, newYPosition, newZPosition) {
-        lookAtPosition = [newXPosition, newYPosition, newZPosition];
-
-        refreshMatrix();
-    };
-*/
     this.setDistance = function(newDistance) {
         distance = newDistance;
 
         refreshMatrix();
     };
 
-/*
-    this.rotateLeftOld = function() {
-        currentPosition[0] += stepSizeRotation;
-        currentPosition[1] += stepSizeRotation;
-
-        refreshMatrix();
-    };
-
-
-    this.rotateRight = function() {
-        currentPosition[0] -= stepSizeRotation;
-        currentPosition[1] -= stepSizeRotation;
-
-        refreshMatrix();
-    };
-
-
-    this.rotateUp = function() {
-        currentPosition[2] += stepSizeRotation;
-        up[2] = (Math.cos(currentPosition[2]) > 0) ? 1 : -1;
-
-        refreshMatrix();
-    };
-
-
-    this.rotateDown = function() {
-        currentPosition[2] -= stepSizeRotation;
-        up[2] = (Math.cos(currentPosition[2]) > 0) ? 1 : -1;
-
-        refreshMatrix();
-    };
-*/
 
     this.moveLeft = function() {
         let tempVector = vec3.create();
         vec3.cross(tempVector, ctx.vectors.cameraFront, ctx.vectors.cameraUp);
         vec3.normalize(tempVector, tempVector);
-        vec3.scale(tempVector, tempVector, ctx.movement.stepSize);
+        vec3.scale(tempVector, tempVector, ctx.speed.keypress);
         vec3.subtract(ctx.vectors.cameraPos, ctx.vectors.cameraPos, tempVector);
         refreshMatrix();
-
-
-        /*vec3.cross(ctx.movement.horizontal, ctx.vectors.cameraDirection, ctx.c.up);
-        vec3.normalize(ctx.movement.horizontal, ctx.movement.horizontal)
-        vec3.scale(ctx.movement.horizontal, ctx.movement.horizontal, ctx.movement.stepSize);
-
-        refreshMatrix();*/
     };
 
 
@@ -122,7 +68,7 @@ export function CameraViewMatrix() {
         let tempVector = vec3.create();
         vec3.cross(tempVector, ctx.vectors.cameraFront, ctx.vectors.cameraUp);
         vec3.normalize(tempVector, tempVector);
-        vec3.scale(tempVector, tempVector, ctx.movement.stepSize);
+        vec3.scale(tempVector, tempVector, ctx.speed.keypress);
         vec3.add(ctx.vectors.cameraPos, ctx.vectors.cameraPos, tempVector);
         refreshMatrix();
     };
@@ -130,7 +76,7 @@ export function CameraViewMatrix() {
 
     this.moveForward = function () {
         let tempVector = vec3.create();
-        vec3.scale(tempVector, ctx.vectors.cameraFront, ctx.movement.stepSize);
+        vec3.scale(tempVector, ctx.vectors.cameraFront, ctx.speed.keypress);
         vec3.add(ctx.vectors.cameraPos, ctx.vectors.cameraPos, tempVector);
 
         refreshMatrix();
@@ -139,15 +85,38 @@ export function CameraViewMatrix() {
 
     this.moveBackward = function () {
         let tempVector = vec3.create();
-        vec3.scale(tempVector, ctx.vectors.cameraFront, ctx.movement.stepSize);
+        vec3.scale(tempVector, ctx.vectors.cameraFront, ctx.speed.keypress);
         vec3.subtract(ctx.vectors.cameraPos, ctx.vectors.cameraPos, tempVector);
 
         refreshMatrix();
     };
 
 
+    this.rotateWithMouse = function(newMouseMovement) {
+        ctx.yaw += ctx.speed.mouse * 100 * newMouseMovement.x;
+        ctx.yaw += 360.0;
+        ctx.yaw = ctx.yaw % 360.0;
+
+        ctx.pitch -= ctx.speed.mouse * 100 * newMouseMovement.y;
+        ctx.pitch = ctx.pitch % 360.0;
+
+        if(ctx.pitch > 89.0) {
+            ctx.pitch = 89.0;
+        }
+
+        if(ctx.pitch < -89.0) {
+            ctx.pitch = -89.0;
+        }
+
+        refreshCameraFront();
+        refreshMatrix();
+    };
+
+
     this.rotateRight = function() {
-        ctx.yaw += ctx.movement.stepSize * 100;
+        ctx.yaw += ctx.speed.keypress * 100;
+        ctx.yaw += 360.0;
+        ctx.yaw = ctx.yaw % 360.0;
 
         refreshCameraFront();
         refreshMatrix();
@@ -155,7 +124,9 @@ export function CameraViewMatrix() {
 
 
     this.rotateLeft = function() {
-        ctx.yaw -= ctx.movement.stepSize * 100;
+        ctx.yaw -= ctx.speed.keypress * 100;
+        ctx.yaw += 360.0;
+        ctx.yaw = ctx.yaw % 360.0;
 
         refreshCameraFront();
         refreshMatrix();
@@ -163,9 +134,10 @@ export function CameraViewMatrix() {
 
 
     this.rotateUp = function() {
-        ctx.pitch += ctx.movement.stepSize * 100;
+        ctx.pitch += ctx.speed.keypress * 100;
+        ctx.pitch = ctx.pitch % 360.0;
 
-        ctx.vectors.up[1] = (ctx.pitch >= 90.0) ? -1 : 1;
+        //ctx.vectors.cameraUp[1] = (ctx.pitch >= 90.0) ? 1 : -1;
 
 
         if(ctx.pitch > 89.0) {
@@ -182,7 +154,8 @@ export function CameraViewMatrix() {
 
 
     this.rotateDown = function() {
-        ctx.pitch -= ctx.movement.stepSize * 100;
+        ctx.pitch -= ctx.speed.keypress * 100;
+        ctx.pitch = ctx.pitch % 360.0;
 
         if(ctx.pitch > 89.0) {
             ctx.pitch = 89.0;
@@ -228,7 +201,6 @@ export function CameraViewMatrix() {
         vec3.add(tempVector, ctx.vectors.cameraPos, ctx.vectors.cameraFront);
 
         mat4.lookAt(ctx.matrix, ctx.vectors.cameraPos, tempVector, ctx.vectors.cameraUp);
-        console.log(ctx.matrix);
     }
 
 

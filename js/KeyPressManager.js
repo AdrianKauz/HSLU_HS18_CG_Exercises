@@ -14,17 +14,13 @@ export function KeyPressManager() {
     });
 
 
-    this.getMap = function(){
-        return keyMap;
-    }
-
     this.beginListening = function() {
         for(let x = 0; x < arguments.length; x++) {
             if(Object.prototype.toString.call(arguments[x]) === "[object String]") {
                 keyMap.set(arguments[x], false);
             }
         }
-    }
+    };
 
 
     this.isPressed = function(newKey) {
