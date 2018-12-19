@@ -1,6 +1,7 @@
 export function CameraViewMatrix() {
     let ctx = {
         matrix : null,
+        matrixHasChanged : false,
         vectors : {
             cameraPos : [0.0, 0.0, 0.0],
             cameraFront : [0.0, 0.0, 0.0],
@@ -11,12 +12,6 @@ export function CameraViewMatrix() {
             cameraUpDirection : [0.0, 0.0 , 0.0],
             up : [0.0, 1.0, 0.0]
         },
-        movement : {
-            horizontal : [0.0, 0.0, 0.0],
-            vertical : [0.0, 0.0, 0.0],
-            yaw : 0.0,
-            pitch : 0.0
-        },
         speed : {
             mouse : 0.001,
             keypress : 0.01
@@ -25,15 +20,20 @@ export function CameraViewMatrix() {
         pitch : 0.0
     };
 
-    let distance = 1.0;
-
+    // Initial
     ctx.vectors.cameraPos = [0.0, 0.0, 1.0];
     ctx.vectors.cameraFront = [0.0, 0.0, -1.0];
     ctx.vectors.cameraUp = [0.0, 1.0, 0.0];
-
     refreshVectors();
 
+
     this.getMatrix = function() {
+        if(ctx.matrixHasChanged) {
+            ctx.matrixHasChanged = false;
+            refreshCameraFront();
+            refreshMatrix();
+        }
+
         return ctx.matrix;
     };
 
@@ -47,114 +47,83 @@ export function CameraViewMatrix() {
     };
 
 
-    this.setDistance = function(newDistance) {
-        distance = newDistance;
-
-        refreshMatrix();
-    };
-
-
     this.moveLeft = function() {
-        let tempVector = vec3.create();
-        vec3.cross(tempVector, ctx.vectors.cameraFront, ctx.vectors.cameraUp);
-        vec3.normalize(tempVector, tempVector);
-        vec3.scale(tempVector, tempVector, ctx.speed.keypress);
-        vec3.subtract(ctx.vectors.cameraPos, ctx.vectors.cameraPos, tempVector);
-        refreshMatrix();
+        moveHorizontal(ctx.speed.keypress * -1);
     };
 
 
     this.moveRight = function() {
-        let tempVector = vec3.create();
-        vec3.cross(tempVector, ctx.vectors.cameraFront, ctx.vectors.cameraUp);
-        vec3.normalize(tempVector, tempVector);
-        vec3.scale(tempVector, tempVector, ctx.speed.keypress);
-        vec3.add(ctx.vectors.cameraPos, ctx.vectors.cameraPos, tempVector);
-        refreshMatrix();
+        moveHorizontal(ctx.speed.keypress);
     };
 
 
     this.moveForward = function () {
-        let tempVector = vec3.create();
-        vec3.scale(tempVector, ctx.vectors.cameraFront, ctx.speed.keypress);
-        vec3.add(ctx.vectors.cameraPos, ctx.vectors.cameraPos, tempVector);
-
-        refreshMatrix();
+        moveVertical(ctx.speed.keypress);
     };
 
 
     this.moveBackward = function () {
-        let tempVector = vec3.create();
-        vec3.scale(tempVector, ctx.vectors.cameraFront, ctx.speed.keypress);
-        vec3.subtract(ctx.vectors.cameraPos, ctx.vectors.cameraPos, tempVector);
-
-        refreshMatrix();
+        moveVertical(ctx.speed.keypress * -1);
     };
 
 
     this.rotateWithMouse = function(newMouseMovement) {
-        ctx.yaw += ctx.speed.mouse * 100 * newMouseMovement.x;
-        ctx.yaw += 360.0;
-        ctx.yaw = ctx.yaw % 360.0;
-
-        ctx.pitch -= ctx.speed.mouse * 100 * newMouseMovement.y;
-        ctx.pitch = ctx.pitch % 360.0;
-
-        if(ctx.pitch > 89.0) {
-            ctx.pitch = 89.0;
-        }
-
-        if(ctx.pitch < -89.0) {
-            ctx.pitch = -89.0;
-        }
-
-        refreshCameraFront();
-        refreshMatrix();
+        refreshYaw(ctx.speed.mouse * 100 * newMouseMovement.x);
+        refreshPitch(ctx.speed.mouse * 100 * newMouseMovement.y * -1);
     };
 
 
     this.rotateRight = function() {
-        ctx.yaw += ctx.speed.keypress * 100;
-        ctx.yaw += 360.0;
-        ctx.yaw = ctx.yaw % 360.0;
-
-        refreshCameraFront();
-        refreshMatrix();
+        refreshYaw(ctx.speed.keypress * 100);
     };
 
 
     this.rotateLeft = function() {
-        ctx.yaw -= ctx.speed.keypress * 100;
-        ctx.yaw += 360.0;
-        ctx.yaw = ctx.yaw % 360.0;
-
-        refreshCameraFront();
-        refreshMatrix();
+        refreshYaw(ctx.speed.keypress * -100);
     };
 
 
     this.rotateUp = function() {
-        ctx.pitch += ctx.speed.keypress * 100;
-        ctx.pitch = ctx.pitch % 360.0;
-
-        //ctx.vectors.cameraUp[1] = (ctx.pitch >= 90.0) ? 1 : -1;
-
-
-        if(ctx.pitch > 89.0) {
-            ctx.pitch = 89.0;
-        }
-
-        if(ctx.pitch < -89.0) {
-            ctx.pitch = -89.0;
-        }
-
-        refreshCameraFront();
-        refreshMatrix();
+        refreshPitch(ctx.speed.keypress * -100);
     };
 
 
     this.rotateDown = function() {
-        ctx.pitch -= ctx.speed.keypress * 100;
+        refreshPitch(ctx.speed.keypress * 100);
+    };
+
+
+    function moveHorizontal(newDistance) {
+        let tempVector = vec3.create();
+        vec3.cross(tempVector, ctx.vectors.cameraFront, ctx.vectors.cameraUp);
+        vec3.normalize(tempVector, tempVector);
+        vec3.scale(tempVector, tempVector, newDistance);
+        vec3.add(ctx.vectors.cameraPos, ctx.vectors.cameraPos, tempVector);
+
+        ctx.matrixHasChanged = true;
+    }
+
+
+    function moveVertical(newDistance) {
+        let tempVector = vec3.create();
+        vec3.scale(tempVector, ctx.vectors.cameraFront, newDistance);
+        vec3.add(ctx.vectors.cameraPos, ctx.vectors.cameraPos, tempVector);
+
+        ctx.matrixHasChanged = true;
+    }
+
+
+    function refreshYaw(newDeltaAngle) {
+        ctx.yaw += newDeltaAngle;
+        ctx.yaw += 360.0;
+        ctx.yaw = ctx.yaw % 360.0;
+
+        ctx.matrixHasChanged = true;
+    }
+
+
+    function refreshPitch(newDeltaAngle) {
+        ctx.pitch += newDeltaAngle;
         ctx.pitch = ctx.pitch % 360.0;
 
         if(ctx.pitch > 89.0) {
@@ -165,9 +134,8 @@ export function CameraViewMatrix() {
             ctx.pitch = -89.0;
         }
 
-        refreshCameraFront();
-        refreshMatrix();
-    };
+        ctx.matrixHasChanged = true;
+    }
 
 
     function refreshCameraFront() {

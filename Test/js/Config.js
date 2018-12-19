@@ -2,7 +2,7 @@ export function Config() {
     this.orbitalObjects = {
         sun : {
             object : {
-                diameter : 41879000, // Real value: 1391016000
+                diameter : 139101600, // Real value: 1391016000
                 orientation : [Math.PI, 0.0, 0.0],
                 rotationVelocity : [0.02, 0.02, 0.02]
             },
@@ -87,8 +87,8 @@ export function Config() {
         jupiter : {
             object : {
                 diameter : 139822000,
-                orientation : [-Math.PI/1.8, 0.0, 0.0],
-                rotationVelocity : [0.0, 0.1, 0.0]
+                orientation : [Math.PI/1.1, 0.0, 0.0],
+                rotationVelocity : [0.1, 0.0, 0.0]
             },
             orbit : {
                 velocity : 4698.076356048,
@@ -99,13 +99,13 @@ export function Config() {
         jupiterMonolith : {
             object : {
                 diameter : 0.0,
-                orientation : [Math.PI/2, Math.PI/3, 0.0],
-                rotationVelocity : [0.0, 0.0, 0.1]
+                orientation : [Math.PI/2, Math.PI/2, 0.0],
+                rotationVelocity : [0.1, 0.0, 0.0]
             },
             orbit : {
-                velocity : 40.076356048,
-                inclination : 185.0,
-                radius : 200900000000
+                velocity : 100.076356048,
+                inclination : 170.0,
+                radius : 50900000000
             }
         },
         jupiterIo : {
@@ -117,7 +117,7 @@ export function Config() {
             orbit : {
                 velocity : 1.769,
                 inclination : 0.04,
-                radius : 230900000000
+                radius : 130900000000
             }
         },
         jupiterEuropa : {
@@ -129,7 +129,7 @@ export function Config() {
             orbit : {
                 velocity : 3.551,
                 inclination : 0.470,
-                radius : 370900000000
+                radius : 170900000000
             }
         },
         jupiterGanymede : {
@@ -141,7 +141,7 @@ export function Config() {
             orbit : {
                 velocity : 7.155,
                 inclination : 2.18,
-                radius : 470400000000
+                radius : 270400000000
             }
         },
         jupiterCallisto : {
@@ -153,14 +153,14 @@ export function Config() {
             orbit : {
                 velocity : 16.689,
                 inclination : 20.00,
-                radius : 870400000000
+                radius : 470400000000
             }
         },
         saturn : {
             object : {
                 diameter : 120500000,
-                orientation : [-Math.PI/3, 0.0, 0.0],
-                rotationVelocity : [0.0, 0.2, 0.0]
+                orientation : [Math.PI/0.9, 0.0, 0.0],
+                rotationVelocity : [0.2, 0.0, 0.0]
             },
             orbit : {
                 velocity : 10759.356685008828,
@@ -171,7 +171,7 @@ export function Config() {
         saturnRing : {
             object : {
                 diameter : 0.0,
-                orientation : [Math.PI/0.87, 0.0, 0.0],
+                orientation : [Math.PI/1.6, 0.0, 0.0],
                 rotationVelocity : [0.0, 0.0, 0.0]
             },
             orbit : {
@@ -183,7 +183,7 @@ export function Config() {
     };
 
     this.dimensions = {
-        object : 0.000000005,
+        object : 0.000000002,
         radius : 0.000000000003,
         sydericPeriod : 365.256363004,
         orbitalPeriodSimulation : 300 // Value in Seconds

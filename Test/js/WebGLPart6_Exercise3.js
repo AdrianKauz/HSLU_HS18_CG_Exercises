@@ -106,7 +106,7 @@ function startup() {
     ctx.textures.set("Saturn", loadTexture(gl, "./img/2k_planet_saturn.jpg"));
     ctx.textures.set("Saturn - Ring", loadTexture(gl, "./img/2k_planet_saturn_ring.png"));
 
-    ctx.textures.set("Earth - Clouds", loadTexture(gl, "./img/1k_planet_earth_clouds.png"));
+    ctx.textures.set("Earth - Clouds", loadTexture(gl, "./img/2k_planet_earth_clouds.png"));
 
     // Cartesian axis
     cartesianObject = new CartesianObject();
@@ -134,7 +134,7 @@ function startup() {
     lightObject.setShaderAttributes(ctx.attributes);
     lightObject.setShaderUniforms(ctx.uniforms);
     lightObject.setPosition(0.0, 0.0, 0.0);
-    lightObject.setColor(255, 255, 235);
+    lightObject.setColor(255, 255, 255);
     lightObject.init(gl);
 
     // CameraMatrix
@@ -142,7 +142,7 @@ function startup() {
     //cameraViewMatrix.setPosition(0.0, 0.0, 3.0);
     //cameraViewMatrix.setUpDirection(0.0, 0.0, 1.0);
     //cameraViewMatrix.setLookAtPosition(0.0, 0.0, 0.0);
-    cameraViewMatrix.setDistance(1.0);
+    //cameraViewMatrix.setDistance(1.0);
 
     // ProjektionMatrix
     setUpProjectionMatrix();
@@ -237,7 +237,7 @@ function defineOrbitalObjects() {
 
     let monolithObject = new OrbitalObject();
     monolithObject.setAllInOneConfig(monolithModel, config.orbitalObjects.jupiterMonolith, config.dimensions);
-    monolithObject.setObjectScaling(0.01, 0.04, 0.09);
+    monolithObject.setObjectScaling(0.001, 0.004, 0.009);
 
     let ioModel = new SimpleSolidSphere(gl, 15, 15);
     ioModel.setShaderAttributes(ctx.attributes);
@@ -293,7 +293,7 @@ function defineOrbitalObjects() {
 
     let saturnRingObject = new OrbitalObject();
     saturnRingObject.setAllInOneConfig(saturnRingModel, config.orbitalObjects.saturnRing, config.dimensions);
-    saturnRingObject.setObjectScaling(2.0, 2.0, 0.0);
+    saturnRingObject.setObjectScaling(0.9, 0.9, 0.0);
 
 
 
@@ -357,7 +357,7 @@ function setUpAttributesAndUniforms(){
 
 function setUpProjectionMatrix() {
     const projectionMatrix = mat4.create();
-    const fieldOfView = glMatrix.toRadian(40) /*Math.PI * 0.5*/;
+    const fieldOfView = glMatrix.toRadian(30) /*Math.PI * 0.5*/;
     const aspect = ctx.canvas.ratio;
     const zNear = 0.001;
     const zFar = 55.0;
@@ -450,7 +450,7 @@ function drawScene() {
     disableTextureMode();
     disableLighting();
     // First draw and set cartesian and light object
-    cartesianObject.draw(gl, cameraMatrix);
+    //cartesianObject.draw(gl, cameraMatrix);
     lightObject.refreshLightPosition(gl, cameraMatrix);
     lightObject.draw(gl);
 
