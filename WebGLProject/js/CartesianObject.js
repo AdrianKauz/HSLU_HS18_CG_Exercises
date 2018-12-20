@@ -7,54 +7,71 @@ export function CartesianObject() {
     let indices = [];
 
     const ctx = {
-        uModelMatrixId : -1,
-        modelMatrix : null,
-    }
+        attributes : {
+            aVertexColorId : -1,
+            aVertexPositionId : -1
+        },
+        uniforms : {
+            uModelMatrixId : -1,
+            uViewMatrixId : -1
+        },
+        matrices : {
+            model : mat4.create()
+        },
+        buffer : {
+            vertices : -1,
+            edges : -1
+        }
+    };
 
-    const buffer = {
-        vertices : -1,
-        edges : -1
-    }
+
+    this.setShaderAttributes = function(newAttributes) {
+        ctx.attributes.aVertexPositionId = newAttributes.aVertexPositionId;
+        ctx.attributes.aVertexColorId = newAttributes.aVertexColorId;
+    };
+
+
+    this.setShaderUniforms = function(newUniforms) {
+        ctx.uniforms.uModelMatrixId = newUniforms.uModelMatrixId;
+        ctx.uniforms.uViewMatrixId = newUniforms.uViewMatrixId;
+    };
 
 
     this.setColor = function(newColor) {
         color = newColor;
-    }
+    };
 
 
     this.setTicks = function(newNumberOfTicks) {
         this.ticks = newNumberOfTicks;
-    }
+    };
 
-    this.setModelMatrixId = function(newModelMatrixId) {
-        ctx.uModelMatrixId = newModelMatrixId;
-    }
 
     this.init = function(gl) {
         vertices = generateVertices(this.ticks);
         indices = generateIndices(this.ticks);
-        buffer.vertices = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        buffer.indices = defineNewBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-    }
+        ctx.buffer.vertices = defineNewBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        ctx.buffer.indices = defineNewBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+    };
 
 
-    this.draw = function(gl, shaderContext) {
-        // Set ModelMatrix
-        refreshModelMatrix();
-        gl.uniformMatrix4fv(ctx.uModelMatrixId, false, ctx.modelMatrix);
+    this.draw = function(gl, newViewMatrix) {
+        // Set Matrices
+        gl.uniformMatrix4fv(ctx.uniforms.uModelMatrixId, false, ctx.matrices.model);
+        gl.uniformMatrix4fv(ctx.uniforms.uViewMatrixId, false, newViewMatrix);
 
         // Define color
-        gl.vertexAttrib4fv(shaderContext.aVertexColorId, color);
+        gl.vertexAttrib4fv(ctx.attributes.aVertexColorId, color);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertices);
-        gl.enableVertexAttribArray(shaderContext.aVertexPositionId);
-        gl.vertexAttribPointer(shaderContext.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, ctx.buffer.vertices);
+        gl.enableVertexAttribArray(ctx.attributes.aVertexPositionId);
+        gl.vertexAttribPointer(ctx.attributes.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ctx.buffer.indices);
         gl.drawElements(gl.LINES, indices.length, gl.UNSIGNED_SHORT, 0);
 
         // Disable
-        gl.disableVertexAttribArray(shaderContext.aVertexPositionId);
+        gl.disableVertexAttribArray(ctx.attributes.aVertexPositionId);
     }
 
 
@@ -90,10 +107,5 @@ export function CartesianObject() {
         }
 
         return indices;
-    }
-
-
-    function refreshModelMatrix() {
-        ctx.modelMatrix = mat4.create();
     }
 }

@@ -1,0 +1,74 @@
+html, body {
+    background: rgb(0, 0, 0);
+    height:100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+}
+
+.title {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 30px;
+    font-weight: 900;
+    color: rgb(255, 255, 255);
+    text-shadow: 2px 2px 3px rgb(0, 0, 0);
+    padding-bottom: 10px;
+}
+
+.description {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: rgb(255, 255, 255);
+    text-shadow: 2px 2px 3px rgb(0, 0, 0);
+    padding-top: 15px;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+}
+
+.debugInfo {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: rgb(255, 255, 255);
+    text-shadow: 2px 2px 3px rgb(0, 0, 0);
+    margin-top: 100px;
+    position: absolute;
+    width: 200px;
+}
+
+
+.key {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    border: 1px solid rgb(230, 230, 230);
+    border-radius: 5px;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 2px 2px 1px rgb(0, 0, 0);
+    background: rgba(200, 200, 200, 0.2);
+    transition: background 0.5s;
+    user-select: none;
+}
+
+.key:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#myCanvas {
+    border: 1px solid rgb(25, 25, 25);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    background: rgb(0, 0, 0);
+    position: absolute;
+}

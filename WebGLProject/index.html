@@ -2,18 +2,36 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>A polygon cube with textures</title>
+        <title>Solarsystem</title>
         <script type="text/javascript" src="../js/webgl-debug.js"></script>
         <script type="text/javascript" src="../js/shaderUtils.js"></script>
         <script type="text/javascript" src="../js/gl-matrix.js"></script>
-        <script type="module" src="js/WebGLPart5_Exercise1.js"></script>
-        <link rel="stylesheet" type="text/css" href="../css/style.css">
+        <script type="module" src="js/WebGLProject_Exercise.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
     </head>
     <body>
-        <div class="container">
-            <div class="title">A polygon cube with textures</div>
-            <canvas id="myCanvas" width="800" height="600"></canvas>
-            <div class="description">Camera controls: Use <span class="key">&#8592;</span> <span class="key">&#8593;</span> <span class="key">&#8595;</span> <span class="key">&#8594;</span> for rotation and <span class="key">+</span> <span class="key">-</span> for move in/out.</div>
+        <div id="container">
+            <canvas id="myCanvas"></canvas>
+            <div class="description">
+                Use <span class="key">w</span>
+                <span class="key">a</span>
+                <span class="key">s</span>
+                <span class="key">d</span> for movement and
+                <span class="key">&#8592;</span>
+                <span class="key">&#8593;</span>
+                <span class="key">&#8595;</span>
+                <span class="key">&#8594;</span> or mouse for rotation<br><br>
+            </div>
+            <div class="debugInfo">
+                <div>
+                    <u>Camera:</u>
+                </div>
+                <div>
+                    Pitch: <span id="cameraPitch"></span>
+                </div>
+                <div>
+                    Yaw: <span id="cameraYaw"></span>
+            </div>
         </div>
     </body>
 </html>
