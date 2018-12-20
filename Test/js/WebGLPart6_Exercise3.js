@@ -91,7 +91,7 @@ function startup() {
     initGL();
 
     ctx.textures.set("NeptuneMoon", loadTexture(gl, "./img/1k_neptune_moon.jpg"));
-    ctx.textures.set("Earth", loadTexture(gl, "./img/2k_planet_earth.jpg"));
+    ctx.textures.set("Earth", loadTexture(gl, "./img/4k_planet_earth.jpg"));
     ctx.textures.set("Sun", loadTexture(gl, "./img/2k_sun.jpg"));
     ctx.textures.set("DeepSpace", loadTexture(gl, "./img/8k_deep_space_004.jpg"));
     ctx.textures.set("Mercury", loadTexture(gl, "./img/2k_planet_mercury.jpg"));
@@ -113,7 +113,7 @@ function startup() {
     cartesianObject.setShaderAttributes(ctx.attributes);
     cartesianObject.setShaderUniforms(ctx.uniforms);
     cartesianObject.setColor(rgbToV4(255, 255, 255));
-    cartesianObject.setTicks(40);
+    cartesianObject.setTicks(120);
     cartesianObject.init(gl);
 
     // Orbital Objects
@@ -450,7 +450,7 @@ function drawScene() {
     disableTextureMode();
     disableLighting();
     // First draw and set cartesian and light object
-    //cartesianObject.draw(gl, cameraMatrix);
+    cartesianObject.draw(gl, cameraMatrix);
     lightObject.refreshLightPosition(gl, cameraMatrix);
     lightObject.draw(gl);
 

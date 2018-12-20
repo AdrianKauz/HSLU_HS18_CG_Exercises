@@ -153,7 +153,7 @@ export function Config() {
             orbit : {
                 velocity : 16.689,
                 inclination : 20.00,
-                radius : 470400000000
+                radius : 370400000000
             }
         },
         saturn : {
