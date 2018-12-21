@@ -58,6 +58,9 @@ const ctx = {
     timeStamp : null,
     textures : new Map(),
     debug : {
+        cameraPositionX : null,
+        cameraPositionY : null,
+        cameraPositionZ : null,
         cameraPitch : null,
         cameraYaw : null
     }
@@ -78,6 +81,9 @@ function startup() {
     ctx.canvas.ratio = ctx.canvas.width / ctx.canvas.height;
 
 
+    ctx.debug.cameraPositionX = document.getElementById("cameraPositionX");
+    ctx.debug.cameraPositionY = document.getElementById("cameraPositionY");
+    ctx.debug.cameraPositionZ = document.getElementById("cameraPositionZ");
     ctx.debug.cameraPitch = document.getElementById("cameraPitch");
     ctx.debug.cameraYaw = document.getElementById("cameraYaw");
 
@@ -135,13 +141,6 @@ function startup() {
     lightObject.setPosition(0.0, 0.0, 0.0);
     lightObject.setColor(255, 255, 255);
     lightObject.init(gl);
-
-    // CameraMatrix
-    //cameraViewMatrix.setPosition(-Math.PI/3, Math.PI/3*2, Math.PI / 5);
-    //cameraViewMatrix.setPosition(0.0, 0.0, 3.0);
-    //cameraViewMatrix.setUpDirection(0.0, 0.0, 1.0);
-    //cameraViewMatrix.setLookAtPosition(0.0, 0.0, 0.0);
-    //cameraViewMatrix.setDistance(1.0);
 
     // ProjektionMatrix
     setUpProjectionMatrix();
@@ -457,6 +456,9 @@ function refreshScene(deltaTime) {
 
 function refreshDebugInfos() {
     let cameraDebugInfos = cameraViewMatrix.getCurrentCameraInfos();
+    ctx.debug.cameraPositionX.innerText = "X: " + cameraDebugInfos.position[0].toFixed(4);
+    ctx.debug.cameraPositionY.innerText = "Y: " + cameraDebugInfos.position[1].toFixed(4);
+    ctx.debug.cameraPositionZ.innerText = "Z: " + cameraDebugInfos.position[2].toFixed(4);
     ctx.debug.cameraPitch.innerText = cameraDebugInfos.pitch.toFixed(2) + '°';
     ctx.debug.cameraYaw.innerText = cameraDebugInfos.yaw.toFixed(2) + '°';
 }

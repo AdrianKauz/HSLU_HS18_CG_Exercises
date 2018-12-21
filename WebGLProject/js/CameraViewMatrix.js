@@ -126,12 +126,12 @@ export function CameraViewMatrix() {
         ctx.pitch += newDeltaAngle;
         ctx.pitch = ctx.pitch % 360.0;
 
-        if(ctx.pitch > 89.0) {
-            ctx.pitch = 89.0;
+        if(ctx.pitch > 89.99) {
+            ctx.pitch = 89.99;
         }
 
-        if(ctx.pitch < -89.0) {
-            ctx.pitch = -89.0;
+        if(ctx.pitch < -89.99) {
+            ctx.pitch = -89.99;
         }
 
         ctx.matrixHasChanged = true;
